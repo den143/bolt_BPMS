@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audience Dashboard - BPMS</title>
+    <link rel="icon" type="image/png" href="../../public/bpms_logo.png">
+    <link rel="stylesheet" href="../../css/style.css">
+    <style>
+        .dashboard-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-xl);
+            background-color: var(--color-background);
+        }
+        .dashboard-card {
+            background-color: var(--color-white);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-2xl);
+            box-shadow: var(--shadow-lg);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        .dashboard-title {
+            font-size: var(--font-size-4xl);
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-md);
+        }
+        .dashboard-subtitle {
+            font-size: var(--font-size-lg);
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-xl);
+        }
+        .dashboard-message {
+            font-size: var(--font-size-base);
+            color: var(--color-text-primary);
+            background-color: var(--color-primary-light);
+            padding: var(--spacing-md);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-xl);
+        }
+        .logout-button {
+            padding: var(--spacing-sm) var(--spacing-lg);
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            color: var(--color-white);
+            background-color: var(--color-primary);
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+        .logout-button:hover {
+            background-color: var(--color-primary-dark);
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-card">
+            <h1 class="dashboard-title">Audience Dashboard</h1>
+            <p class="dashboard-subtitle">Beauty Pageant Management System</p>
+            <div class="dashboard-message">
+                ✅ Successfully redirected to Audience dashboard!
+            </div>
+            <p style="color: var(--color-text-secondary); margin-bottom: var(--spacing-lg);">
+                You are now viewing the Audience dashboard. This is where you can view events and vote for your favorite contestants.
+            </p>
+            <button class="logout-button" onclick="window.location.href='../../index.html'">Back to Login</button>
+        </div>
+    </div>
+</body>
+</html>
+

@@ -234,6 +234,15 @@ p {
     gap: var(--spacing-md);
     transition: all var(--transition-base);
     cursor: pointer;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.feature-card.fade-in-up {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    transition-delay: var(--animation-delay, 0s);
 }
 
 .feature-card:hover {
@@ -284,24 +293,33 @@ p {
 }
 
 .signin-card {
-    background-color: var(--color-white);
-    border-radius: var(--radius-xl);
-    padding: var(--spacing-xl);
-    box-shadow: var(--shadow-xl);
-    border: 1px solid var(--color-border);
+    background: linear-gradient(180deg, var(--color-white), #fbfbfb);
+    border-radius: calc(var(--radius-xl));
+    padding: var(--spacing-2xl);
+    box-shadow: 0 10px 30px rgba(18, 18, 18, 0.06);
+    border: 1px solid rgba(0,0,0,0.04);
+    max-width: 520px;
+    width: 100%;
+    margin: 0 auto;
+    transition: box-shadow var(--transition-base), transform var(--transition-base);
+}
+
+.signin-card:hover {
+    box-shadow: 0 18px 40px rgba(18,18,18,0.08);
+    transform: translateY(-3px);
 }
 
 .signin-title {
-    font-size: var(--font-size-3xl);
+    font-size: var(--font-size-4xl);
     font-weight: 700;
     color: var(--color-text-primary);
-    margin-bottom: var(--spacing-xs);
+    margin-bottom: var(--spacing-sm);
 }
 
 .signin-subtitle {
     font-size: var(--font-size-sm);
     color: var(--color-text-secondary);
-    margin-bottom: var(--spacing-xl);
+    margin-bottom: var(--spacing-md);
 }
 
 /* ========================================
@@ -312,7 +330,7 @@ p {
 }
 
 .form-group {
-    margin-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
 }
 
 .form-label {
@@ -338,8 +356,8 @@ p {
 
 .form-input {
     width: 100%;
-    padding: 0.75rem var(--spacing-md) 0.75rem 3rem;
-    font-size: var(--font-size-base);
+    padding: 0.875rem var(--spacing-md) 0.875rem 3rem;
+    font-size: 1.025rem;
     font-family: var(--font-family);
     color: var(--color-text-primary);
     background-color: var(--color-white);
@@ -347,7 +365,7 @@ p {
     border-radius: var(--radius-md);
     transition: all var(--transition-base);
     outline: none;
-}
+} 
 
 .form-input::placeholder {
     color: var(--color-text-light);
@@ -364,6 +382,31 @@ p {
 
 .form-input.error:focus {
     box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+/* Success message styling */
+.success-message {
+    display: none;
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    background-color: rgba(22, 163, 74, 0.1);
+    border: 1px solid var(--color-success);
+    border-radius: var(--radius-md);
+    color: var(--color-success);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    text-align: center;
+}
+
+/* Demo account fill highlight animation */
+.demo-fill-highlight {
+    background-color: #f0f9ff !important;
+    transition: background-color 0.3s ease;
+}
+
+/* Shake animation for form errors */
+.shake-animation {
+    animation: shake 0.5s;
 }
 
 .toggle-password {
@@ -401,6 +444,43 @@ p {
     margin-top: var(--spacing-xs);
     min-height: 1rem;
 }
+
+/* Footer inside card */
+.form-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}
+
+.form-footer a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.form-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Select input styling */
+.form-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, var(--color-text-light) 50%),
+                      linear-gradient(135deg, var(--color-text-light) 50%, transparent 50%),
+                      linear-gradient(to right, var(--color-border), var(--color-border));
+    background-position: calc(100% - 1.25rem) calc(1em + .5px), calc(100% - .75rem) calc(1em + .5px), 100% 100%;
+    background-size: .45em .45em, .45em .45em, 1px 1.5em;
+    background-repeat: no-repeat;
+    padding-right: 2.75rem;
+}
+
+
 
 /* ========================================
    Button Styles
@@ -539,21 +619,6 @@ p {
     animation: slideUp var(--transition-slow);
 }
 
-.modal-icon {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto var(--spacing-md);
-    background-color: rgba(22, 163, 74, 0.1);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.modal-icon svg {
-    color: var(--color-success);
-}
-
 .modal-title {
     font-size: var(--font-size-2xl);
     font-weight: 700;
@@ -567,26 +632,48 @@ p {
     margin-bottom: var(--spacing-lg);
 }
 
-.modal-close {
-    width: 100%;
-    padding: 0.875rem var(--spacing-md);
+/* Modal form styles */
+.modal-form {
+    margin-top: var(--spacing-lg);
+    text-align: left;
+}
+
+.modal-form .form-group {
+    margin-bottom: var(--spacing-md);
+}
+
+.modal-form .form-label {
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-xs);
+}
+
+.modal-form .form-input {
+    padding: 0.75rem var(--spacing-md) 0.75rem 3rem;
     font-size: var(--font-size-base);
-    font-weight: 600;
+}
+
+/* Secondary close button for modals */
+.modal-close-secondary {
+    width: 100%;
+    padding: 0.75rem var(--spacing-md);
+    font-size: var(--font-size-base);
+    font-weight: 500;
     font-family: var(--font-family);
-    color: var(--color-white);
-    background-color: var(--color-success);
-    border: none;
+    color: var(--color-text-secondary);
+    background-color: transparent;
+    border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
     cursor: pointer;
     transition: all var(--transition-base);
+    margin-top: var(--spacing-sm);
 }
 
-.modal-close:hover {
-    background-color: #15803D;
-    transform: translateY(-1px);
+.modal-close-secondary:hover {
+    background-color: var(--color-background);
+    border-color: var(--color-text-light);
 }
 
-.modal-close:active {
+.modal-close-secondary:active {
     transform: translateY(0);
 }
 
@@ -618,6 +705,12 @@ p {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
 }
 
 /* ========================================
@@ -710,10 +803,37 @@ p {
 
     .signin-card {
         padding: var(--spacing-lg);
+        width: 100%;
+        box-shadow: var(--shadow-md);
     }
+
+    /* Mobile form input tweaks */
+    .form-input, .form-select {
+        padding: 0.875rem var(--spacing-md) 0.875rem 3rem;
+        font-size: var(--font-size-base);
+    }
+
+    .submit-button {
+        padding: 1rem var(--spacing-md);
+        font-size: 1rem;
+    }
+
+    .form-footer {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--spacing-xs);
+        text-align: left;
+    }
+
+    .form-footer a { text-align: left; }
 
     .demo-grid {
         grid-template-columns: 1fr;
+    }
+
+    /* Make touch targets bigger */
+    .feature-card, .submit-button, .form-input, .form-select {
+        touch-action: manipulation;
     }
 }
 
@@ -736,10 +856,39 @@ p {
 
     .signin-card {
         padding: var(--spacing-md);
+        border-radius: calc(var(--radius-lg) - 4px);
+    }
+
+    .form-input, .form-select {
+        padding: 1rem var(--spacing-md) 1rem 3rem;
+        font-size: var(--font-size-base);
+    }
+
+    .submit-button {
+        padding: 1rem;
+        font-size: 1rem;
+        border-radius: var(--radius-md);
+    }
+
+    .toggle-password {
+        right: var(--spacing-sm);
+        padding: 0.5rem;
+    }
+
+    .form-footer {
+        font-size: var(--font-size-sm);
+        gap: var(--spacing-xs);
     }
 
     .modal-content {
         padding: var(--spacing-lg);
+        width: 95%;
+        max-width: 420px;
+    }
+
+    /* Ensure large tap targets */
+    .feature-card, .submit-button, .form-input, .form-select {
+        min-height: 44px;
     }
 }
 

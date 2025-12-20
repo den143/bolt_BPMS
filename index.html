@@ -108,6 +108,33 @@
 
                         <form id="signinForm" class="signin-form" novalidate>
                             <div class="form-group">
+                                <label for="role" class="form-label">Role</label>
+                                <div class="input-wrapper">
+                                    <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="12" cy="7" r="4"/>
+                                    </svg>
+                                    <select
+                                        id="role"
+                                        name="role"
+                                        class="form-input form-select"
+                                        required
+                                        aria-required="true"
+                                    >
+                                        <option value="">Select your role</option>
+                                        <option value="Event Manager">Event Manager</option>
+                                        <option value="Judge Coordinator">Judge Coordinator</option>
+                                        <option value="Contestant Manager">Contestant Manager</option>
+                                        <option value="Tabulator">Tabulator</option>
+                                        <option value="Judge">Judge</option>
+                                        <option value="Contestant">Contestant</option>
+                                        <option value="Audience">Audience</option>
+                                    </select>
+                                </div>
+                                <span class="error-message" id="roleError"></span>
+                            </div>
+
+                            <div class="form-group">
                                 <label for="email" class="form-label">Email</label>
                                 <div class="input-wrapper">
                                     <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -166,27 +193,109 @@
                         </form>
 
                         <div class="form-footer">
-                            <a href="#" class="forgot-password">Forgot Password?</a>
-                            <p class="sign-up-text">Don't have an account? <a href="#" class="sign-up-link">Sign Up</a></p>
-                    </div>
+                            <p class="footer-text">Don't have an account? <a href="#" class="footer-link" id="signUpLink">Sign Up</a></p>
+                            <p class="footer-text"><a href="#" class="footer-link" id="forgotPasswordLink">Forgot Password?</a></p>
+                        </div>
                 </section>
             </div>
         </div>
     </main>
 
-    <!-- Success Modal -->
-    <div id="successModal" class="modal hidden" role="dialog" aria-labelledby="modalTitle" aria-hidden="true">
+    <!-- Forgot Password Modal -->
+    <div id="forgotPasswordModal" class="modal hidden" role="dialog" aria-labelledby="forgotPasswordTitle" aria-hidden="true">
         <div class="modal-overlay"></div>
         <div class="modal-content">
-            <div class="modal-icon">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                    <polyline points="22 4 12 14.01 9 11.01"/>
-                </svg>
-            </div>
-            <h3 id="modalTitle" class="modal-title">Sign In Successful!</h3>
-            <p class="modal-message">Welcome back to BPMS</p>
-            <button class="modal-close" id="closeModal">Continue</button>
+            <h3 id="forgotPasswordTitle" class="modal-title">Forgot Password</h3>
+            <p class="modal-message">Enter your email address and we'll send you a link to reset your password.</p>
+            <form id="forgotPasswordForm" class="modal-form">
+                <div class="form-group">
+                    <label for="forgotEmail" class="form-label">Email</label>
+                    <div class="input-wrapper">
+                        <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                            <polyline points="22,6 12,13 2,6"/>
+                        </svg>
+                        <input
+                            type="email"
+                            id="forgotEmail"
+                            name="email"
+                            class="form-input"
+                            placeholder="Enter your email"
+                            required
+                        >
+                    </div>
+                    <span class="error-message" id="forgotEmailError"></span>
+                </div>
+                <button type="submit" class="submit-button">Send Reset Link</button>
+            </form>
+            <button class="modal-close-secondary" id="closeForgotPasswordModal">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Sign Up Modal -->
+    <div id="signUpModal" class="modal hidden" role="dialog" aria-labelledby="signUpTitle" aria-hidden="true">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <h3 id="signUpTitle" class="modal-title">Create Account</h3>
+            <p class="modal-message">Fill in the form below to create your account.</p>
+            <form id="signUpForm" class="modal-form">
+                <div class="form-group">
+                    <label for="signUpName" class="form-label">Full Name</label>
+                    <div class="input-wrapper">
+                        <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        <input
+                            type="text"
+                            id="signUpName"
+                            name="name"
+                            class="form-input"
+                            placeholder="Enter your full name"
+                            required
+                        >
+                    </div>
+                    <span class="error-message" id="signUpNameError"></span>
+                </div>
+                <div class="form-group">
+                    <label for="signUpEmail" class="form-label">Email</label>
+                    <div class="input-wrapper">
+                        <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                            <polyline points="22,6 12,13 2,6"/>
+                        </svg>
+                        <input
+                            type="email"
+                            id="signUpEmail"
+                            name="email"
+                            class="form-input"
+                            placeholder="Enter your email"
+                            required
+                        >
+                    </div>
+                    <span class="error-message" id="signUpEmailError"></span>
+                </div>
+                <div class="form-group">
+                    <label for="signUpPassword" class="form-label">Password</label>
+                    <div class="input-wrapper">
+                        <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                        </svg>
+                        <input
+                            type="password"
+                            id="signUpPassword"
+                            name="password"
+                            class="form-input"
+                            placeholder="Create a password"
+                            required
+                        >
+                    </div>
+                    <span class="error-message" id="signUpPasswordError"></span>
+                </div>
+                <button type="submit" class="submit-button">Sign Up</button>
+            </form>
+            <button class="modal-close-secondary" id="closeSignUpModal">Cancel</button>
         </div>
     </div>
 
