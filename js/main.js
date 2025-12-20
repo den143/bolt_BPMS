@@ -661,35 +661,28 @@ const BPMS = {
     handleSignUpSubmit(e) {
         e.preventDefault();
         
-        const nameInput = document.getElementById('signUpName');
         const emailInput = document.getElementById('signUpEmail');
+        const roleInput = document.getElementById('signUpRole');
         const passwordInput = document.getElementById('signUpPassword');
-        const nameError = document.getElementById('signUpNameError');
         const emailError = document.getElementById('signUpEmailError');
+        const roleError = document.getElementById('signUpRoleError');
         const passwordError = document.getElementById('signUpPasswordError');
         
         // Check if all elements exist
-        if (!nameInput || !emailInput || !passwordInput || !nameError || !emailError || !passwordError) {
+        if (!emailInput || !roleInput || !passwordInput || !emailError || !roleError || !passwordError) {
             console.error('BPMS: Sign up form elements not found');
             return;
         }
         
         // Clear previous errors
-        nameError.textContent = '';
         emailError.textContent = '';
+        roleError.textContent = '';
         passwordError.textContent = '';
-        nameInput.classList.remove('error');
         emailInput.classList.remove('error');
+        roleInput.classList.remove('error');
         passwordInput.classList.remove('error');
         
         let isValid = true;
-        
-        // Validate name
-        if (!nameInput.value.trim()) {
-            nameError.textContent = 'Name is required';
-            nameInput.classList.add('error');
-            isValid = false;
-        }
         
         // Validate email
         if (!emailInput.value.trim()) {
@@ -699,6 +692,19 @@ const BPMS = {
         } else if (!BPMS.isValidEmail(emailInput.value.trim())) {
             emailError.textContent = 'Please enter a valid email address';
             emailInput.classList.add('error');
+            isValid = false;
+        }
+        
+        // Validate role
+        const allowedRoles = ['Event Manager', 'Contestant', 'Audience'];
+        const selectedRole = roleInput.value.trim();
+        if (!selectedRole) {
+            roleError.textContent = 'Please select a role';
+            roleInput.classList.add('error');
+            isValid = false;
+        } else if (!allowedRoles.includes(selectedRole)) {
+            roleError.textContent = 'This role cannot be self-registered. Please contact Event Manager.';
+            roleInput.classList.add('error');
             isValid = false;
         }
         
@@ -719,12 +725,12 @@ const BPMS = {
         
         // Simulate account creation
         console.log('Sign up submitted:', {
-            name: nameInput.value.trim(),
-            email: emailInput.value.trim()
+            email: emailInput.value.trim(),
+            role: selectedRole
         });
         
         // Show success message
-        alert('Account created successfully! You can now sign in.');
+        alert(`Account created successfully! You can now sign in as ${selectedRole}.`);
         
         // Close modal and reset form
         this.closeSignUpModal();
