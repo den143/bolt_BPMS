@@ -487,6 +487,115 @@
                 <!-- Other Views (hidden by default, will be shown when navigating) -->
                 <div id="otherViews" class="other-views hidden">
                     <!-- Content for other navigation items will be loaded here -->
+                     <section id="manageOrganizersView" class="dashboard-view">
+                        <div class="page-header">
+                            <div>
+                            <h1 class="event-title">Manage Organizers</h1>
+                            <p class="page-subtitle">Assign and manage Judge Coordinator, Contestant Manager, and Tabulator</p>
+                            </div>
+                            <button id="addOrganizerBtn" class="submit-button">Add New Organizer</button>
+                        </div>
+
+                        <div class="filters-bar">
+                            <input id="organizerSearch" class="form-input" type="text" placeholder="Search name or email">
+                            <select id="filterRole" class="form-input form-select">
+                            <option value="">All Roles</option>
+                            <option value="Judge Coordinator">Judge Coordinator</option>
+                            <option value="Contestant Manager">Contestant Manager</option>
+                            <option value="Tabulator">Tabulator</option>
+                            </select>
+                            <select id="filterStatus" class="form-input form-select">
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="pending">Pending</option>
+                            </select>
+                            <select id="sortBy" class="form-input form-select">
+                            <option value="date_desc">Newest</option>
+                            <option value="name_asc">Name A–Z</option>
+                            <option value="role_asc">Role</option>
+                            <option value="status_asc">Status</option>
+                            </select>
+                        </div>
+
+                        <div id="bulkActionsBar" class="bulk-actions hidden">
+                            <button id="bulkActivate" class="table-action-btn view">Activate</button>
+                            <button id="bulkDeactivate" class="table-action-btn view">Deactivate</button>
+                            <button id="bulkDelete" class="table-action-btn view">Delete</button>
+                        </div>
+
+                        <div class="recent-registrations-card">
+                            <h2 class="section-title">Organizers</h2>
+                            <table class="data-table" id="organizersTable">
+                            <thead>
+                                <tr>
+                                <th><input type="checkbox" id="selectAllOrganizers"></th>
+                                <th>Avatar</th>
+                                <th>Name/Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Date Added</th>
+                                <th>Last Login</th>
+                                <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="organizersTbody">
+                                <tr>
+                                <td colspan="8" class="empty-state">
+                                    <div class="empty-state-text">No organizers yet</div>
+                                </td>
+                                </tr>
+                            </tbody>
+                            </table>
+                        </div>
+                        </section>
+
+                        <div id="organizerModal" class="modal hidden" role="dialog" aria-labelledby="organizerModalTitle" aria-hidden="true">
+                        <div class="modal-overlay"></div>
+                        <div class="modal-content">
+                            <h3 id="organizerModalTitle" class="modal-title">Add Organizer</h3>
+                            <form id="organizerForm" class="modal-form" novalidate>
+                            <div class="form-group">
+                                <label for="organizerRole" class="form-label">Organizer Type</label>
+                                <div class="input-wrapper">
+                                <select id="organizerRole" class="form-input form-select" required>
+                                    <option value="">Select type</option>
+                                    <option value="Judge Coordinator">Judge Coordinator</option>
+                                    <option value="Contestant Manager">Contestant Manager</option>
+                                    <option value="Tabulator">Tabulator</option>
+                                </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="organizerEmail" class="form-label">Email Address</label>
+                                <div class="input-wrapper">
+                                <input id="organizerEmail" type="email" class="form-input" placeholder="name@example.com" required>
+                                </div>
+                                <span class="error-message" id="organizerEmailError"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="organizerPassword" class="form-label">Temporary Password</label>
+                                <div class="input-wrapper">
+                                <input id="organizerPassword" type="password" class="form-input" placeholder="Minimum 8 characters" required>
+                                <button type="button" id="togglePassword" class="toggle-password">👁</button>
+                                </div>
+                                <div id="passwordStrength" class="error-message"></div>
+                                <button type="button" id="generatePassword" class="submit-button">Generate Password</button>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                <input type="checkbox" id="sendCredentials" disabled> Send credentials via email
+                                </label>
+                            </div>
+
+                            <button type="submit" class="submit-button">Add Organizer</button>
+                            <button type="button" id="cancelOrganizer" class="submit-button">Cancel</button>
+                            </form>
+                        </div>
+                        </div>
                 </div>
             </main>
         </div>

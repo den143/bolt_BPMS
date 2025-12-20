@@ -1059,8 +1059,7 @@ const EventManagerDashboard = {
                 // Dashboard view is already shown above
                 break;
             case 'manage-organizers':
-                console.log('Navigate to: Manage Organizers');
-                // TODO: Load manage organizers content
+                this.renderManageOrganizersView();
                 break;
             case 'manage-activities':
                 console.log('Navigate to: Manage Activities');
@@ -1117,6 +1116,390 @@ const EventManagerDashboard = {
         if (this.elements.otherViews) {
             this.elements.otherViews.classList.remove('hidden');
         }
+    },
+
+    renderManageOrganizersView() {
+        if (!this.elements.otherViews) return;
+        const html = `
+            <section id="manageOrganizersView" class="dashboard-view">
+              <div class="page-header">
+                <div>
+                  <h1 class="event-title">Manage Organizers</h1>
+                  <p class="page-subtitle">Assign and manage Judge Coordinator, Contestant Manager, and Tabulator</p>
+                </div>
+                <button id="addOrganizerBtn" class="submit-button">Add New Organizer</button>
+              </div>
+
+              <div class="filters-bar">
+                <input id="organizerSearch" class="form-input" type="text" placeholder="Search name or email">
+                <select id="filterStatus" class="form-input form-select">
+                  <option value="">All Status</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                  <option value="pending">Pending</option>
+                </select>
+              </div>
+
+              
+
+              <div class="recent-registrations-card">
+                <h2 class="section-title">Organizers</h2>
+                <table class="data-table" id="organizersTable">
+                  <thead>
+                    <tr>
+                      <th>Avatar</th>
+                      <th>Name/Email</th>
+                      <th>Role</th>
+                      <th>Status</th>
+                      <th>Date Added</th>
+                      <th>Last Login</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="organizersTbody">
+                    <tr>
+                      <td colspan="7" class="empty-state">
+                        <div class="empty-state-text">No organizers yet</div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <div id="organizerModal" class="modal organizer-modal hidden" role="dialog" aria-labelledby="organizerModalTitle" aria-hidden="true">
+              <div class="modal-overlay"></div>
+              <div class="modal-content">
+                <h3 id="organizerModalTitle" class="modal-title">Add Organizer</h3>
+                <form id="organizerForm" class="modal-form" novalidate>
+                  <div class="form-group">
+                    <label for="organizerRole" class="form-label">Organizer Type</label>
+                    <div class="input-wrapper">
+                      <select id="organizerRole" class="form-input form-select" required>
+                        <option value="">Select type</option>
+                        <option value="Judge Coordinator">Judge Coordinator</option>
+                        <option value="Contestant Manager">Contestant Manager</option>
+                        <option value="Tabulator">Tabulator</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="organizerEmail" class="form-label">Email Address</label>
+                    <div class="input-wrapper">
+                      <input id="organizerEmail" type="email" class="form-input" placeholder="name@example.com" required>
+                    </div>
+                    <span class="error-message" id="organizerEmailError"></span>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="organizerPassword" class="form-label">Temporary Password</label>
+                    <div class="input-wrapper">
+                      <input id="organizerPassword" type="password" class="form-input" placeholder="Minimum 8 characters" required>
+                      <button type="button" id="togglePassword" class="toggle-password">👁</button>
+                    </div>
+                    <div id="passwordStrength" class="error-message"></div>
+                    <button type="button" id="generatePassword" class="submit-button secondary-button">Generate Password</button>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">
+                      <input type="checkbox" id="sendCredentials" disabled> Send credentials via email
+                    </label>
+                  </div>
+
+                  <div class="modal-actions">
+                    <button type="button" id="cancelOrganizer" class="submit-button secondary-button">Cancel</button>
+                    <button type="submit" class="submit-button">Add Organizer</button>
+                  </div>
+                </form>
+              </div>
+            </div>`;
+        this.elements.otherViews.innerHTML = html;
+        this.attachManageOrganizersHandlers();
+        this.loadAndRenderOrganizers();
+    },
+
+    attachManageOrganizersHandlers() {
+        const addBtn = document.getElementById('addOrganizerBtn');
+        const modal = document.getElementById('organizerModal');
+        const overlay = modal ? modal.querySelector('.modal-overlay') : null;
+        const cancelBtn = document.getElementById('cancelOrganizer');
+        const toggleBtn = document.getElementById('togglePassword');
+        const generateBtn = document.getElementById('generatePassword');
+        const form = document.getElementById('organizerForm');
+        const search = document.getElementById('organizerSearch');
+        const filterStatus = document.getElementById('filterStatus');
+        const sortBy = document.getElementById('sortBy');
+
+        if (addBtn) addBtn.addEventListener('click', () => this.openOrganizerModal());
+        if (overlay) overlay.addEventListener('click', () => this.closeOrganizerModal());
+        if (cancelBtn) cancelBtn.addEventListener('click', () => this.closeOrganizerModal());
+        if (toggleBtn) toggleBtn.addEventListener('click', () => this.togglePasswordVisibility());
+        if (generateBtn) generateBtn.addEventListener('click', () => this.fillGeneratedPassword());
+        if (form) form.addEventListener('submit', (e) => this.handleOrganizerSubmit(e));
+        if (search) search.addEventListener('input', () => this.loadAndRenderOrganizers());
+        if (filterStatus) filterStatus.addEventListener('change', () => this.loadAndRenderOrganizers());
+        if (sortBy) sortBy.addEventListener('change', () => this.loadAndRenderOrganizers());
+        const tbody = document.getElementById('organizersTbody');
+        if (tbody) tbody.addEventListener('click', (e) => this.handleTableClick(e));
+    },
+
+    openOrganizerModal() {
+        const modal = document.getElementById('organizerModal');
+        if (!modal) return;
+        modal.classList.remove('hidden');
+        modal.setAttribute('aria-hidden', 'false');
+        const email = document.getElementById('organizerEmail');
+        if (email) email.focus();
+    },
+
+    closeOrganizerModal() {
+        const modal = document.getElementById('organizerModal');
+        if (!modal) return;
+        modal.classList.add('hidden');
+        modal.setAttribute('aria-hidden', 'true');
+        const form = document.getElementById('organizerForm');
+        if (form) form.reset();
+        const strength = document.getElementById('passwordStrength');
+        if (strength) strength.textContent = '';
+    },
+
+    togglePasswordVisibility() {
+        const input = document.getElementById('organizerPassword');
+        if (!input) return;
+        input.type = input.type === 'password' ? 'text' : 'password';
+    },
+
+    fillGeneratedPassword() {
+        const input = document.getElementById('organizerPassword');
+        if (!input) return;
+        const pwd = this.generateStrongPassword();
+        input.value = pwd;
+        this.updateStrengthIndicator(pwd);
+    },
+
+    updateStrengthIndicator(value) {
+        const el = document.getElementById('passwordStrength');
+        if (!el) return;
+        let score = 0;
+        if (value.length >= 8) score++;
+        if (/[A-Z]/.test(value)) score++;
+        if (/[a-z]/.test(value)) score++;
+        if (/[0-9]/.test(value)) score++;
+        if (/[^A-Za-z0-9]/.test(value)) score++;
+        el.textContent = score >= 4 ? 'Strong' : score >= 3 ? 'Medium' : 'Weak';
+    },
+
+    generateStrongPassword() {
+        const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const lower = 'abcdefghijklmnopqrstuvwxyz';
+        const nums = '0123456789';
+        const syms = '!@#$%^&*()_+{}[]<>?';
+        const all = upper + lower + nums + syms;
+        let r = '';
+        for (let i = 0; i < 12; i++) r += all[Math.floor(Math.random() * all.length)];
+        return r;
+    },
+
+    handleOrganizerSubmit(e) {
+        e.preventDefault();
+        const role = document.getElementById('organizerRole');
+        const email = document.getElementById('organizerEmail');
+        const password = document.getElementById('organizerPassword');
+        const emailErr = document.getElementById('organizerEmailError');
+        if (!role || !email || !password) return;
+        const roleVal = role.value.trim();
+        const emailVal = email.value.trim();
+        const pwdVal = password.value;
+        emailErr.textContent = '';
+        if (!roleVal) return;
+        const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal);
+        if (!emailValid) {
+            emailErr.textContent = 'Invalid email';
+            return;
+        }
+        if (pwdVal.length < 8) return;
+        const event = this.state.activeEvent;
+        const key = this.getOrganizersKey(event && event.id ? event.id : 'default');
+        const list = this.loadOrganizersRaw(key);
+        if (list.some(o => o.email.toLowerCase() === emailVal.toLowerCase())) {
+            emailErr.textContent = 'Email already exists';
+            return;
+        }
+        const id = 'organizer_' + Date.now();
+        const obj = {
+            id,
+            email: emailVal,
+            password: 'hashed_password',
+            role: roleVal,
+            status: 'active',
+            created_at: new Date().toISOString(),
+            created_by: 'event_manager',
+            last_login: null,
+            password_changed: false,
+            event_id: event && event.id ? event.id : 'event_default'
+        };
+        list.push(obj);
+        localStorage.setItem(key, JSON.stringify(list));
+        this.closeOrganizerModal();
+        this.loadAndRenderOrganizers();
+    },
+
+    getOrganizersKey(eventId) {
+        return 'bpms_organizers_' + eventId;
+    },
+
+    loadOrganizersRaw(key) {
+        const raw = localStorage.getItem(key);
+        try {
+            return raw ? JSON.parse(raw) : [];
+        } catch(e) {
+            return [];
+        }
+    },
+
+    loadAndRenderOrganizers() {
+        const event = this.state.activeEvent;
+        const key = this.getOrganizersKey(event && event.id ? event.id : 'default');
+        const list = this.loadOrganizersRaw(key);
+        const filtered = this.applyOrganizersFilters(list);
+        this.renderOrganizersTable(filtered);
+    },
+
+    applyOrganizersFilters(list) {
+        const search = document.getElementById('organizerSearch');
+        const status = document.getElementById('filterStatus');
+        const sortBy = document.getElementById('sortBy');
+        let res = list.slice();
+        const s = search && search.value ? search.value.toLowerCase() : '';
+        if (s) {
+            res = res.filter(o => (o.email && o.email.toLowerCase().includes(s)));
+        }
+        const st = status && status.value ? status.value : '';
+        if (st) res = res.filter(o => o.status === st);
+        const sort = sortBy ? sortBy.value : 'date_desc';
+        res.sort((a,b) => {
+            if (sort === 'name_asc') return (a.email||'').localeCompare(b.email||'');
+            if (sort === 'role_asc') return (a.role||'').localeCompare(b.role||'');
+            if (sort === 'status_asc') return (a.status||'').localeCompare(b.status||'');
+            const ad = a.created_at ? new Date(a.created_at).getTime() : 0;
+            const bd = b.created_at ? new Date(b.created_at).getTime() : 0;
+            return bd - ad;
+        });
+        return res;
+    },
+
+    renderOrganizersTable(list) {
+        const tbody = document.getElementById('organizersTbody');
+        if (!tbody) return;
+        if (!list || list.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="empty-state"><div class="empty-state-text">No organizers yet</div></td></tr>`;
+            return;
+        }
+        const rows = list.map(o => {
+            const initials = (o.email||'').slice(0,2).toUpperCase();
+            const roleBadge = `<span class="status-badge">${o.role}</span>`;
+            const statusClass = o.status === 'active' ? 'approved' : (o.status === 'pending' ? 'pending' : '');
+            const statusBadge = `<span class="status-badge ${statusClass}">${o.status.charAt(0).toUpperCase()+o.status.slice(1)}</span>`;
+            const dateAdded = o.created_at ? new Date(o.created_at).toLocaleDateString() : '-';
+            const lastLogin = o.last_login ? new Date(o.last_login).toLocaleDateString() : '-';
+            return `
+                <tr data-id="${o.id}">
+                  <td><div class="avatar">${initials}</div></td>
+                  <td>${o.email}</td>
+                  <td>${roleBadge}</td>
+                  <td>${statusBadge}</td>
+                  <td>${dateAdded}</td>
+                  <td>${lastLogin}</td>
+                  <td>
+                    <div class="row-actions">
+                      <button class="table-action-btn view" data-action="edit">Edit</button>
+                      <button class="table-action-btn view" data-action="toggle">${o.status === 'active' ? 'Deactivate' : 'Activate'}</button>
+                    </div>
+                  </td>
+                </tr>`;
+        }).join('');
+        tbody.innerHTML = rows;
+    },
+
+    handleTableClick(e) {
+        const btn = e.target.closest('button');
+        const row = e.target.closest('tr');
+        if (!row) return;
+        const id = row.getAttribute('data-id');
+        if (!btn) return;
+        const action = btn.getAttribute('data-action');
+        if (action === 'toggle') this.toggleOrganizerStatus(id);
+        else if (action === 'edit') this.editOrganizer(id);
+    },
+
+    toggleSelectAll(checked) {
+        const boxes = Array.from(document.querySelectorAll('#organizersTbody .row-select'));
+        boxes.forEach(b => b.checked = checked);
+        this.updateBulkActionsVisibility();
+    },
+
+    selectedOrganizerIds() {
+        const rows = Array.from(document.querySelectorAll('#organizersTbody tr'));
+        return rows.filter(r => {
+            const cb = r.querySelector('.row-select');
+            return cb && cb.checked;
+        }).map(r => r.getAttribute('data-id'));
+    },
+
+    updateBulkActionsVisibility() {
+        const bar = document.getElementById('bulkActionsBar');
+        if (!bar) return;
+        const any = this.selectedOrganizerIds().length > 0;
+        bar.classList.toggle('hidden', !any);
+    },
+
+    bulkUpdateStatus(next) {
+        const ids = this.selectedOrganizerIds();
+        if (ids.length === 0) return;
+        const event = this.state.activeEvent;
+        const key = this.getOrganizersKey(event && event.id ? event.id : 'default');
+        const list = this.loadOrganizersRaw(key);
+        ids.forEach(id => {
+            const o = list.find(x => x.id === id);
+            if (o) o.status = next;
+        });
+        localStorage.setItem(key, JSON.stringify(list));
+        this.loadAndRenderOrganizers();
+    },
+
+    bulkDelete() {
+        const ids = this.selectedOrganizerIds();
+        if (ids.length === 0) return;
+        if (!confirm('Delete selected organizers?')) return;
+        const event = this.state.activeEvent;
+        const key = this.getOrganizersKey(event && event.id ? event.id : 'default');
+        let list = this.loadOrganizersRaw(key);
+        list = list.filter(o => !ids.includes(o.id));
+        localStorage.setItem(key, JSON.stringify(list));
+        this.loadAndRenderOrganizers();
+    },
+
+    toggleOrganizerStatus(id) {
+        const event = this.state.activeEvent;
+        const key = this.getOrganizersKey(event && event.id ? event.id : 'default');
+        const list = this.loadOrganizersRaw(key);
+        const o = list.find(x => x.id === id);
+        if (!o) return;
+        if (o.status === 'active') {
+            if (!confirm('Deactivate this organizer?')) return;
+            o.status = 'inactive';
+        } else {
+            o.status = 'active';
+        }
+        localStorage.setItem(key, JSON.stringify(list));
+        this.loadAndRenderOrganizers();
+    },
+
+
+    editOrganizer(id) {
+        alert('Edit organizer coming soon');
     },
 
     /**
