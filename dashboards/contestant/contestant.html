@@ -3,25 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contestant Dashboard - BPMS</title>
-    <link rel="icon" type="image/png" href="../../public/bpms_logo.png">
-    <link rel="stylesheet" href="../../css/style.css">
+    <title>Contestant Portal | Miss Pageant 2025</title>
     <link rel="stylesheet" href="contestant.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div class="dashboard-container">
-        <div class="dashboard-card">
-            <h1 class="dashboard-title">Contestant Dashboard</h1>
-            <p class="dashboard-subtitle">Beauty Pageant Management System</p>
-            <div class="dashboard-message">
-                ✅ Successfully redirected to Contestant dashboard!
-            </div>
-            <p style="color: var(--color-text-secondary); margin-bottom: var(--spacing-lg);">
-                You are now viewing the Contestant dashboard. This is where you can manage your profile and view event information.
-            </p>
-            <button class="logout-button" onclick="window.location.href='../../index.html'">Back to Login</button>
+
+    <div class="header">
+        <img src="../../public/bpms_logo.png" alt="Profile" class="profile-img">
+        <div class="welcome-text">
+            <h2>Welcome, Candidate #04</h2>
+            <h1>Sophia Anderson</h1>
+            <p>Representing: New York</p>
         </div>
     </div>
+
+    <!-- Removed Stats/Status Cards as requested -->
+
+
+    <div class="countdown">
+        <i class="fas fa-clock"></i> Next Event: Rehearsal in 2 hours
+    </div>
+
+    <div class="menu-grid">
+        <a href="edit_profile.php" class="menu-item">
+            <span class="menu-icon">👤</span>
+            <span class="menu-label">My Profile</span>
+        </a>
+        <a href="schedule.php" class="menu-item">
+            <span class="menu-icon">📅</span>
+            <span class="menu-label">Schedule</span>
+        </a>
+        <a href="#" class="menu-item">
+            <span class="menu-icon">👀</span>
+            <span class="menu-label">see contestant</span>
+        </a>
+    </div>
+
+    <div class="bottom-nav">
+        <button class="inbox-btn" onclick="openInboxModal()">
+            <i class="fas fa-envelope nav-icon"></i> Inbox
+        </button>
+    </div>
+
+    <div id="inboxModal" class="modal-overlay" aria-hidden="true">
+        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="inboxTitle">
+            <button class="modal-close" aria-label="Close inbox" onclick="closeInboxModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            <h3 id="inboxTitle">Inbox</h3>
+            <div class="modal-body">
+                <div class="empty-state">No messages</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../js/dashboards/contestant/contestant.js"></script>
 </body>
 </html>
-

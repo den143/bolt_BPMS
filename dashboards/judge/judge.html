@@ -2,26 +2,170 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Judge Dashboard - BPMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Judge Panel | BPMS</title>
     <link rel="icon" type="image/png" href="../../public/bpms_logo.png">
-    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="judge.css">
 </head>
 <body>
-    <div class="dashboard-container">
-        <div class="dashboard-card">
-            <h1 class="dashboard-title">Judge Dashboard</h1>
-            <p class="dashboard-subtitle">Beauty Pageant Management System</p>
-            <div class="dashboard-message">
-                ✅ Successfully redirected to Judge dashboard!
+
+    <!-- Header -->
+    <header class="app-header">
+        <div class="brand">
+            <img src="../../public/bpms_logo.png" alt="Logo" class="brand-logo">
+            <div class="brand-info">
+                <div class="brand-name">BPMS</div>
+                <div class="brand-role">Judge Panel</div>
             </div>
-            <p style="color: var(--color-text-secondary); margin-bottom: var(--spacing-lg);">
-                You are now viewing the Judge dashboard. This is where you can score contestants and view your assignments.
-            </p>
-            <button class="logout-button" onclick="window.location.href='../../index.html'">Back to Login</button>
+        </div>
+        <div class="user-actions">
+            <span class="judge-name">Judge 1</span>
+            <button class="logout-btn" onclick="confirmLogout()">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Round Info -->
+    <div class="round-header">
+        <div class="round-title">
+            <i class="fas fa-medal"></i> Preliminary Round
+        </div>
+        <div class="round-status">
+            0/5 Complete
         </div>
     </div>
+
+    <!-- Segments Tabs (Horizontal Scroll) -->
+    <div class="segment-tabs" id="segmentTabsContainer">
+        <!-- Segments will be loaded dynamically -->
+    </div>
+
+    <!-- Contestant List -->
+    <div class="contestant-list-container" id="contestantListContainer">
+        <!-- Contestants will be loaded dynamically or fall back to static -->
+
+        
+        <!-- Scored Item (Example) -->
+        <div class="contestant-card scored" onclick="openScoreModal(1, 'Maria Santos', 73)">
+            <div class="rank-badge">1</div>
+            <div class="contestant-info">
+                <div class="c-name">Maria Santos</div>
+                <div class="c-number">Contestant #1</div>
+            </div>
+            <div class="score-display">
+                <span class="score-val">73</span>
+                <span class="score-total">/100 pts</span>
+            </div>
+        </div>
+
+        <!-- Unscored Items -->
+        <div class="contestant-card" onclick="openScoreModal(2, 'Ana Garcia', 0)">
+            <div class="rank-badge">2</div>
+            <div class="contestant-info">
+                <div class="c-name">Ana Garcia</div>
+                <div class="c-number">Contestant #2</div>
+            </div>
+            <button class="score-action-btn">Tap to Score</button>
+        </div>
+
+        <div class="contestant-card" onclick="openScoreModal(3, 'Sofia Rodriguez', 0)">
+            <div class="rank-badge">3</div>
+            <div class="contestant-info">
+                <div class="c-name">Sofia Rodriguez</div>
+                <div class="c-number">Contestant #3</div>
+            </div>
+            <button class="score-action-btn">Tap to Score</button>
+        </div>
+
+        <div class="contestant-card" onclick="openScoreModal(4, 'Isabella Martinez', 0)">
+            <div class="rank-badge">4</div>
+            <div class="contestant-info">
+                <div class="c-name">Isabella Martinez</div>
+                <div class="c-number">Contestant #4</div>
+            </div>
+            <button class="score-action-btn">Tap to Score</button>
+        </div>
+
+        <div class="contestant-card" onclick="openScoreModal(5, 'Camila Lopez', 0)">
+            <div class="rank-badge">5</div>
+            <div class="contestant-info">
+                <div class="c-name">Camila Lopez</div>
+                <div class="c-number">Contestant #5</div>
+            </div>
+            <button class="score-action-btn">Tap to Score</button>
+        </div>
+
+        <!-- Spacer for fixed bottom button -->
+        <div style="height: 80px;"></div>
+    </div>
+
+    <!-- Fixed Bottom Action -->
+    <div class="bottom-action-bar">
+        <button class="submit-all-btn">
+            <i class="fas fa-paper-plane"></i> Submit All Scores
+        </button>
+    </div>
+
+    <!-- Scoring Modal -->
+    <div class="modal-overlay" id="scoreModal">
+        <div class="modal-sheet">
+            <div class="sheet-header">
+                <div class="sheet-contestant">
+                    <div class="sheet-avatar">
+                        <i class="far fa-user"></i>
+                    </div>
+                    <div>
+                        <div class="sheet-c-number" id="modalCNumber">Contestant #1</div>
+                        <div class="sheet-c-name" id="modalCName">Maria Santos</div>
+                    </div>
+                </div>
+                <div class="sheet-score">
+                    <span class="sheet-score-val" id="modalTotalScore">0</span>
+                    <span class="sheet-score-max">/ 100 pts</span>
+                    <button class="sheet-close" onclick="closeScoreModal()"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+
+            <div class="sheet-body">
+                <!-- Round/Segment Info in Modal -->
+                <div class="sheet-segment-info">
+                    <div class="sheet-seg-title" id="modalSegmentTitle">Segment</div>
+                    <div class="sheet-seg-weight" id="modalSegmentWeight">Weight: 0%</div>
+                </div>
+
+                <div id="criteriaContainer">
+                    <!-- Criteria will be injected here -->
+                </div>
+
+                <!-- Comments -->
+                <div class="comments-section">
+                    <label class="crit-title">Comments (Optional)</label>
+                    <textarea class="comment-box" id="scoreComment" placeholder="Add any comments or notes about this contestant's performance..."></textarea>
+                </div>
+                
+                <div style="height: 20px;"></div>
+                
+                <button class="save-score-btn" onclick="saveScore()">
+                    <i class="far fa-save"></i> Save Score
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div class="modal-overlay" id="logoutModal" style="z-index: 2000;">
+        <div class="confirm-box">
+            <h3>Log Out?</h3>
+            <p>Are you sure you want to end your judging session?</p>
+            <div class="confirm-actions">
+                <button class="c-btn cancel" onclick="closeLogoutModal()">Cancel</button>
+                <button class="c-btn confirm" onclick="doLogout()">Log Out</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../js/dashboards/judge/judge.js"></script>
 </body>
 </html>
-
