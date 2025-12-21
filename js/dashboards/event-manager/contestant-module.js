@@ -1,15 +1,8 @@
 window.ContestantModule = {
-    state: {
-        activeEvent: null,
-        editingId: null,
-        contestants: []
-    },
-
     init(view) {
         this.cacheElements(view);
         this.attachEventListeners();
-        this.loadContestants();
-        this.renderContestants();
+        this.renderContestantsTable();
     },
 
     cacheElements(view) {
@@ -20,10 +13,7 @@ window.ContestantModule = {
         this.contestantForm = this.view.querySelector('#contestantForm');
         this.photoInput = this.view.querySelector('#photo');
         this.imagePreview = this.view.querySelector('#imagePreview');
-        this.searchInput = this.view.querySelector('#searchContestant');
-        this.filterStatus = this.view.querySelector('#filterStatus');
-        this.tableBody = this.view.querySelector('#contestantsTbody');
-        this.modalTitle = this.view.querySelector('#contestantModalTitle');
+        this.contestantsTbody = this.view.querySelector('#contestantsTbody');
     },
 
     attachEventListeners() {
@@ -51,142 +41,78 @@ window.ContestantModule = {
             this.contestantForm.addEventListener('submit', (e) => this.handleFormSubmit(e));
         }
 
-        if (this.searchInput) {
-            this.searchInput.addEventListener('input', () => this.renderContestants());
-        }
-
-        if (this.filterStatus) {
-            this.filterStatus.addEventListener('change', () => this.renderContestants());
-        }
-
-        if (this.tableBody) {
-            this.tableBody.addEventListener('click', (e) => this.handleTableAction(e));
-        }
-    },
-
-    loadContestants() {
-        const stored = localStorage.getItem('bpms_contestants');
-        this.state.contestants = stored ? JSON.parse(stored) : [];
-    },
-
-    saveContestants() {
-        localStorage.setItem('bpms_contestants', JSON.stringify(this.state.contestants));
-        this.renderContestants();
-    },
-
-    renderContestants() {
-        if (!this.tableBody) return;
-
-        const searchTerm = this.searchInput ? this.searchInput.value.toLowerCase() : '';
-        const statusFilter = this.filterStatus ? this.filterStatus.value : 'All';
-
-        const filtered = this.state.contestants.filter(c => {
-            const matchesSearch = (c.firstName + ' ' + c.lastName).toLowerCase().includes(searchTerm);
-            const matchesStatus = statusFilter === 'All' || c.status === statusFilter;
-            return matchesSearch && matchesStatus;
-        });
-
-        if (filtered.length === 0) {
-            this.tableBody.innerHTML = `
-                <tr>
-                    <td colspan="7" class="empty-state">
-                        <div class="empty-state-text">No contestants found</div>
-                    </td>
-                </tr>`;
-            return;
-        }
-
-        this.tableBody.innerHTML = filtered.map(c => `
-            <tr>
-                <td>
-                    <img src="${c.photo || 'https://via.placeholder.com/40'}" alt="Photo" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
-                </td>
-                <td>${c.firstName} ${c.lastName}</td>
-                <td>${this.calculateAge(c.dob)}</td>
-                <td>
-                    <span class="status-badge ${c.status === 'Active' ? 'approved' : 'pending'}">
-                        ${c.status}
-                    </span>
-                </td>
-                <td>${c.email}</td>
-                <td>${c.contactNumber}</td>
-                <td>
-                    <button class="submit-button secondary-button" data-action="edit" data-id="${c.id}" style="width: auto; padding: 4px 10px; font-size: 12px; margin-right: 5px;">Edit</button>
-                    <button class="submit-button secondary-button" data-action="toggle-status" data-id="${c.id}" style="width: auto; padding: 4px 10px; font-size: 12px;">${c.status === 'Active' ? 'Deactivate' : 'Activate'}</button>
-                </td>
-            </tr>
-        `).join('');
-    },
-
-    calculateAge(dob) {
-        if (!dob) return '-';
-        const birthDate = new Date(dob);
-        const today = new Date();
-        let age = today.getFullYear() - birthDate.getFullYear();
-        const m = today.getMonth() - birthDate.getMonth();
-        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-            age--;
-        }
-        return age;
-    },
-
-    openModal(id = null) {
-        if (this.contestantModal) {
-            this.contestantModal.classList.remove('hidden');
-            this.state.editingId = id;
-            
-            if (this.modalTitle) {
-                this.modalTitle.textContent = id ? 'Edit Contestant' : 'Add Contestant';
-            }
-
-            if (id) {
-                const c = this.state.contestants.find(x => x.id === id);
-                if (c) {
-                    this.setFormValues(c);
+        if (this.contestantsTbody) {
+            this.contestantsTbody.addEventListener('click', (e) => {
+                const editBtn = e.target.closest('.edit-contestant');
+                const toggleBtn = e.target.closest('.toggle-contestant-status');
+                if (editBtn) {
+                    const id = editBtn.getAttribute('data-id');
+                    const list = this.loadContestants();
+                    const obj = list.find(c => c.id === id);
+                    if (obj) this.openModal(obj);
+                    return;
                 }
-            } else {
-                this.contestantForm.reset();
-                this.resetImagePreview();
-            }
+                if (toggleBtn) {
+                    const id = toggleBtn.getAttribute('data-id');
+                    const list = this.loadContestants();
+                    const idx = list.findIndex(c => c.id === id);
+                    if (idx >= 0) {
+                        list[idx].status = list[idx].status === 'inactive' ? 'active' : 'inactive';
+                        list[idx].updated_at = new Date().toISOString();
+                        this.saveContestants(list);
+                        this.renderContestantsTable();
+                    }
+                    return;
+                }
+            });
         }
     },
 
-    setFormValues(c) {
-        if (!this.contestantForm) return;
-        document.getElementById('firstName').value = c.firstName || '';
-        document.getElementById('lastName').value = c.lastName || '';
-        document.getElementById('dob').value = c.dob || '';
-        document.getElementById('email').value = c.email || '';
-        document.getElementById('contactNumber').value = c.contactNumber || '';
-        document.getElementById('address').value = c.address || '';
-        document.getElementById('tempPassword').value = c.tempPassword || ''; // In real app, don't show password
-        
-        if (c.photo) {
-            this.imagePreview.src = c.photo;
+    openModal(contestant) {
+        if (!this.contestantModal) return;
+        const title = this.view.querySelector('#contestantModalTitle');
+        const form = this.contestantForm;
+        const firstNameEl = this.view.querySelector('#firstName');
+        const lastNameEl = this.view.querySelector('#lastName');
+        const dobEl = this.view.querySelector('#dob');
+        const emailEl = this.view.querySelector('#email');
+        const contactEl = this.view.querySelector('#contactNumber');
+        const addressEl = this.view.querySelector('#address');
+        const passEl = this.view.querySelector('#tempPassword');
+        if (contestant) {
+            if (title) title.textContent = 'Edit Contestant';
+            if (form) { form.setAttribute('data-mode','edit'); form.setAttribute('data-id', contestant.id); }
+            if (firstNameEl) firstNameEl.value = contestant.firstName || '';
+            if (lastNameEl) lastNameEl.value = contestant.lastName || '';
+            if (dobEl) dobEl.value = contestant.dob || '';
+            if (emailEl) emailEl.value = contestant.email || '';
+            if (contactEl) contactEl.value = contestant.contactNumber || '';
+            if (addressEl) addressEl.value = contestant.address || '';
+            if (passEl) passEl.value = contestant.temp_password || '';
+            if (this.imagePreview) this.imagePreview.src = contestant.photo || this.getDefaultPhoto();
         } else {
-            this.resetImagePreview();
+            if (title) title.textContent = 'Add Contestant';
+            if (form) { form.setAttribute('data-mode','add'); form.setAttribute('data-id',''); }
         }
+        this.contestantModal.classList.remove('hidden');
     },
 
     closeModal() {
         if (this.contestantModal) {
             this.contestantModal.classList.add('hidden');
             this.contestantForm.reset();
-            this.resetImagePreview();
-            this.state.editingId = null;
+            this.imagePreview.src = this.getDefaultPhoto();
+            this.contestantForm.setAttribute('data-mode','add');
+            this.contestantForm.setAttribute('data-id','');
         }
-    },
-
-    resetImagePreview() {
-        this.imagePreview.src = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'200\' viewBox=\'0 0 200 200\'%3E%3Crect fill=\'%23ddd\' width=\'200\' height=\'200\'/%3E%3Ctext fill=\'%23555\' font-family=\'sans-serif\' font-size=\'30\' dy=\'10.5\' font-weight=\'bold\' x=\'50%25\' y=\'50%25\' text-anchor=\'middle\'%3ENo Image%3C/text%3E%3C/svg%3E';
     },
 
     handleImagePreview() {
         const file = this.photoInput.files[0];
-        const defaultImage = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'200\' viewBox=\'0 0 200 200\'%3E%3Crect fill=\'%23ddd\' width=\'200\' height=\'200\'/%3E%3Ctext fill=\'%23555\' font-family=\'sans-serif\' font-size=\'30\' dy=\'10.5\' font-weight=\'bold\' x=\'50%25\' y=\'50%25\' text-anchor=\'middle\'%3ENo Image%3C/text%3E%3C/svg%3E';
-        
         if (!file) {
-            this.imagePreview.src = defaultImage;
+            const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="100%" height="100%" fill="#cccccc"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="20" fill="#333333">No Image</text></svg>';
+            const uri = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+            this.imagePreview.src = uri;
             return;
         }
 
@@ -194,7 +120,7 @@ window.ContestantModule = {
         if (!validImageTypes.includes(file.type)) {
             alert('Invalid file type. Please select a JPG or PNG image.');
             this.photoInput.value = '';
-            this.imagePreview.src = defaultImage;
+            this.imagePreview.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="100%" height="100%" fill="#cccccc"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="20" fill="#333333">No Image</text></svg>';
             return;
         }
 
@@ -202,7 +128,7 @@ window.ContestantModule = {
         if (file.size > maxSizeInBytes) {
             alert('File size exceeds 5MB. Please select a smaller file.');
             this.photoInput.value = '';
-            this.imagePreview.src = defaultImage;
+            this.imagePreview.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="100%" height="100%" fill="#cccccc"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="20" fill="#333333">No Image</text></svg>';
             return;
         }
 
@@ -215,58 +141,75 @@ window.ContestantModule = {
 
     handleFormSubmit(e) {
         e.preventDefault();
-        
-        const formData = {
-            id: this.state.editingId || 'contestant_' + Date.now(),
-            firstName: document.getElementById('firstName').value,
-            lastName: document.getElementById('lastName').value,
-            dob: document.getElementById('dob').value,
-            email: document.getElementById('email').value,
-            contactNumber: document.getElementById('contactNumber').value,
-            address: document.getElementById('address').value,
-            tempPassword: document.getElementById('tempPassword').value,
-            photo: this.imagePreview.src, // Saving data URL directly for demo
-            status: 'Active',
-            registeredAt: new Date().toISOString()
-        };
-
-        if (this.state.editingId) {
-            const index = this.state.contestants.findIndex(c => c.id === this.state.editingId);
-            if (index !== -1) {
-                // Preserve status and registration date if editing
-                formData.status = this.state.contestants[index].status;
-                formData.registeredAt = this.state.contestants[index].registeredAt;
-                this.state.contestants[index] = formData;
-            }
+        const firstName = this.view.querySelector('#firstName')?.value.trim() || '';
+        const lastName = this.view.querySelector('#lastName')?.value.trim() || '';
+        const dob = this.view.querySelector('#dob')?.value || '';
+        const email = this.view.querySelector('#email')?.value.trim() || '';
+        const contactNumber = this.view.querySelector('#contactNumber')?.value.trim() || '';
+        const address = this.view.querySelector('#address')?.value.trim() || '';
+        const tempPassword = this.view.querySelector('#tempPassword')?.value || '';
+        const photo = this.imagePreview?.src || this.getDefaultPhoto();
+        const list = this.loadContestants();
+        const form = this.contestantForm;
+        const mode = form ? form.getAttribute('data-mode') : 'add';
+        const id = mode === 'edit' && form ? form.getAttribute('data-id') : ('contestant_' + Date.now());
+        const base = { id, firstName, lastName, dob, email, contactNumber, address, temp_password: tempPassword, photo, updated_at: new Date().toISOString() };
+        if (mode === 'edit') {
+            const idx = list.findIndex(c => c.id === id);
+            if (idx >= 0) list[idx] = { ...(list[idx]||{}), ...base };
         } else {
-            this.state.contestants.push(formData);
+            const obj = { ...base, created_at: new Date().toISOString(), status: 'active' };
+            list.push(obj);
         }
-
-        this.saveContestants();
+        this.saveContestants(list);
+        this.renderContestantsTable();
         this.closeModal();
-    },
-
-    handleTableAction(e) {
-        const btn = e.target.closest('button');
-        if (!btn) return;
-
-        const action = btn.dataset.action;
-        const id = btn.dataset.id;
-
-        if (action === 'edit') {
-            this.openModal(id);
-        } else if (action === 'toggle-status') {
-            this.toggleStatus(id);
+    }
+    ,
+    getDefaultPhoto() {
+        const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="100%" height="100%" fill="#cccccc"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="20" fill="#333333">No Image</text></svg>';
+        return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+    }
+    ,
+    getContestantsKey() { return 'bpms_contestants'; }
+    ,
+    loadContestants() {
+        let list = [];
+        try { list = JSON.parse(localStorage.getItem(this.getContestantsKey()) || '[]'); } catch(e) { list = []; }
+        return Array.isArray(list) ? list : [];
+    }
+    ,
+    saveContestants(list) {
+        localStorage.setItem(this.getContestantsKey(), JSON.stringify(list || []));
+    }
+    ,
+    renderContestantsTable() {
+        const tbody = this.contestantsTbody;
+        if (!tbody) return;
+        const list = this.loadContestants();
+        if (!list || list.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><div class="empty-state-text">No contestants registered yet</div></td></tr>';
+            return;
         }
-    },
-
-    toggleStatus(id) {
-        const contestant = this.state.contestants.find(c => c.id === id);
-        if (contestant) {
-            contestant.status = contestant.status === 'Active' ? 'Inactive' : 'Active';
-            this.saveContestants();
-        }
+        const rows = list.map(c => {
+            const name = (c.firstName || '') + ' ' + (c.lastName || '');
+            const photoSrc = c.photo || this.getDefaultPhoto();
+            const toggleText = (c.status === 'inactive') ? 'Activate' : 'Deactivate';
+            const statusBadge = '<span class="status-badge ' + ((c.status === 'inactive') ? 'rejected' : 'approved') + '">' + ((c.status === 'inactive') ? 'Inactive' : 'Active') + '</span>';
+            return (
+                '<tr>' +
+                '<td><img class="avatar" src="' + photoSrc + '" alt="' + name + '" /></td>' +
+                '<td>' + name + '</td>' +
+                '<td>' + (c.email || '') + '</td>' +
+                '<td>' + statusBadge + '</td>' +
+                '<td>' + (c.contactNumber || '') + '</td>' +
+                '<td>' +
+                    '<button class="table-action-btn view edit-contestant" data-id="' + c.id + '">Edit</button>' +
+                    '<button class="table-action-btn view toggle-contestant-status" data-id="' + c.id + '">' + toggleText + '</button>' +
+                '</td>' +
+                '</tr>'
+            );
+        }).join('');
+        tbody.innerHTML = rows;
     }
 };
-
-

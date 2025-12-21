@@ -1071,7 +1071,7 @@ const EventManagerDashboard = {
                 this.renderManageSegmentsView();
                 break;
             case 'manage-awards':
-                this.renderSectionView('Manage Awards', 'Create and manage awards');
+                this.renderManageAwardsView();
                 break;
             case 'register-contestant':
                 this.renderRegisterContestantView();
@@ -1139,7 +1139,6 @@ const EventManagerDashboard = {
             .then(r => r.text())
             .then(html => {
                 this.elements.otherViews.innerHTML = html;
-                // Pass the container element because the modal is a sibling of the main view
                 if (window.ContestantModule && typeof window.ContestantModule.init === 'function') {
                     window.ContestantModule.init(this.elements.otherViews);
                 }
@@ -1155,6 +1154,32 @@ const EventManagerDashboard = {
                 this.elements.otherViews.innerHTML = html;
                 this.attachManageActivitiesHandlers();
                 this.loadAndRenderActivities();
+            });
+    },
+
+    renderRegisterJudgeView() {
+        if (!this.elements.otherViews) return;
+        this.showOtherView('register-judge');
+        fetch('./register-judge.html')
+            .then(r => r.text())
+            .then(html => {
+                this.elements.otherViews.innerHTML = html;
+                if (window.UserManagementModule && typeof window.UserManagementModule.initJudgeView === 'function') {
+                    window.UserManagementModule.initJudgeView(this.state.activeEvent);
+                }
+            });
+    },
+
+    renderResultPanelView() {
+        if (!this.elements.otherViews) return;
+        this.showOtherView('result-panel');
+        fetch('./result-panel.html')
+            .then(r => r.text())
+            .then(html => {
+                this.elements.otherViews.innerHTML = html;
+                if (window.ScoringModule && typeof window.ScoringModule.init === 'function') {
+                    window.ScoringModule.init(this.state.activeEvent);
+                }
             });
     },
 
@@ -1192,32 +1217,6 @@ const EventManagerDashboard = {
                 this.elements.otherViews.innerHTML = html;
                 if (window.AwardsModule && typeof window.AwardsModule.initAwardsView === 'function') {
                     window.AwardsModule.initAwardsView(this.state.activeEvent);
-                }
-            });
-    },
-
-    renderResultPanelView() {
-        if (!this.elements.otherViews) return;
-        this.showOtherView('result-panel');
-        fetch('./result-panel.html')
-            .then(r => r.text())
-            .then(html => {
-                this.elements.otherViews.innerHTML = html;
-                if (window.ScoringModule && typeof window.ScoringModule.init === 'function') {
-                    window.ScoringModule.init(this.state.activeEvent ? this.state.activeEvent : null);
-                }
-            });
-    },
-
-    renderRegisterJudgeView() {
-        if (!this.elements.otherViews) return;
-        this.showOtherView('register-judge');
-        fetch('./register-judge.html')
-            .then(r => r.text())
-            .then(html => {
-                this.elements.otherViews.innerHTML = html;
-                if (window.UserManagementModule && typeof window.UserManagementModule.initJudgeView === 'function') {
-                    window.UserManagementModule.initJudgeView(this.state.activeEvent);
                 }
             });
     },
@@ -1437,6 +1436,7 @@ const EventManagerDashboard = {
         const container = document.getElementById('roundsContainer');
         if (!container) return;
         if (!list || list.length === 0) {
+                const isActive = r.active !== false;
             container.innerHTML = `<div class="empty-state"><div class="empty-state-text">No rounds yet</div></div>`;
             return;
         }

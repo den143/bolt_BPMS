@@ -4,49 +4,123 @@
             <h1 class="event-title">Result Panel</h1>
             <p class="page-subtitle">View results and rankings</p>
         </div>
+        <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="overview">Overview</button>
+            <button class="tab-btn" data-tab="round-results">Round Results</button>
+            <button class="tab-btn" data-tab="leaderboard">Leaderboard</button>
+            <button class="tab-btn" data-tab="breakdown">Breakdown</button>
+            <button class="tab-btn" data-tab="export">Export</button>
+        </div>
     </div>
 
-    <div class="recent-registrations-card">
-        <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1rem;">
-            <button class="submit-button secondary-button" data-tab="overview">Overview</button>
-            <button class="submit-button secondary-button" data-tab="round-results">Round Results</button>
-            <button class="submit-button secondary-button" data-tab="leaderboard">Leaderboard</button>
-            <button class="submit-button secondary-button" data-tab="breakdown">Breakdown</button>
-            <button class="submit-button secondary-button" data-tab="export">Export</button>
+    <div id="tab-overview" class="tab-panel">
+        <div id="overviewContent">
+            <!-- Content injected by scoring-module.js -->
         </div>
+    </div>
 
-        <div id="tab-overview" class="tab-panel">
-            <h2 class="section-title">Overview</h2>
-            <div class="empty-state">
-                <div class="empty-state-text">Overview summary will appear here</div>
+    <div id="tab-round-results" class="tab-panel hidden">
+        <div class="filters-bar">
+            <select id="roundSelect" class="form-input form-select">
+                <option value="">Select Round</option>
+            </select>
+        </div>
+        <div class="recent-registrations-card">
+            <table class="data-table" id="roundResultsTable">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Contestant</th>
+                        <th>Total Score</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="roundResultsTbody">
+                    <tr><td colspan="4" class="empty-state">Select a round to view results</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="tab-leaderboard" class="tab-panel hidden">
+        <div class="recent-registrations-card">
+            <h2 class="section-title">Overall Leaderboard</h2>
+            <table class="data-table" id="leaderboardTable">
+                <thead>
+                    <tr>
+                        <th>Contestant</th>
+                        <th>Prelim</th>
+                        <th>Semis</th>
+                        <th>Final</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboardTbody">
+                    <tr><td colspan="5" class="empty-state">No data available</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="tab-breakdown" class="tab-panel hidden">
+        <div class="filters-bar breakdown-filters">
+            <div class="filter-group">
+                <label for="breakdownRoundSelect" class="filter-label">Choose a Round:</label>
+                <select id="breakdownRoundSelect" class="form-input form-select">
+                    <option value="">Select Round</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="breakdownSegmentSelect" class="filter-label">Choose a Segment:</label>
+                <select id="breakdownSegmentSelect" class="form-input form-select">
+                    <option value="">Select Segment</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="breakdownContestantSelect" class="filter-label">Choose a Contestant:</label>
+                <select id="breakdownContestantSelect" class="form-input form-select">
+                    <option value="">Select Contestant</option>
+                </select>
             </div>
         </div>
-
-        <div id="tab-round-results" class="tab-panel hidden">
-            <h2 class="section-title">Round Results</h2>
-            <div class="empty-state">
-                <div class="empty-state-text">Round results will appear here</div>
-            </div>
+        <div class="recent-registrations-card">
+            <div id="breakdownHeader" class="section-title" style="margin-bottom: 1rem;"></div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Criteria</th>
+                        <th>Score</th>
+                        <th>Max</th>
+                    </tr>
+                </thead>
+                <tbody id="breakdownTbody">
+                    <tr><td colspan="3" class="empty-state">Select a round, segment, and contestant</td></tr>
+                </tbody>
+            </table>
+            <div id="breakdownTotal" class="stat-value" style="margin-top: 1rem; font-size: 1.2rem;">Segment Total: -</div>
         </div>
+    </div>
 
-        <div id="tab-leaderboard" class="tab-panel hidden">
-            <h2 class="section-title">Leaderboard</h2>
-            <div class="empty-state">
-                <div class="empty-state-text">Leaderboard will appear here</div>
+    <div id="tab-export" class="tab-panel hidden">
+        <div class="recent-registrations-card">
+            <h2 class="section-title">Export Results</h2>
+            <div class="quick-actions-grid">
+                <button class="quick-action-btn" id="exportPdfBtn">
+                    <span>Export as PDF (Print)</span>
+                </button>
+                <button class="quick-action-btn" id="exportCSV">
+                    <span>Export as CSV</span>
+                </button>
             </div>
-        </div>
-
-        <div id="tab-breakdown" class="tab-panel hidden">
-            <h2 class="section-title">Breakdown</h2>
-            <div class="empty-state">
-                <div class="empty-state-text">Score breakdown will appear here</div>
+            
+            <h3 class="section-title" style="margin-top: 2rem;">Audit Summary</h3>
+            <div id="auditContent" class="audit-container" style="background: #f8f9fa; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+                <!-- Audit stats injected here -->
             </div>
-        </div>
 
-        <div id="tab-export" class="tab-panel hidden">
-            <h2 class="section-title">Export</h2>
-            <div class="empty-state">
-                <div class="empty-state-text">Export options will appear here</div>
+            <h3 class="section-title">Anomalies</h3>
+            <div id="anomaliesList" class="anomalies-container" style="color: #dc3545;">
+                <!-- Anomalies list injected here -->
             </div>
         </div>
     </div>

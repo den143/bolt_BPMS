@@ -143,7 +143,6 @@ window.UserManagementModule = {
             <div class="row-actions">
               <button class="table-action-btn view" data-action="edit">Edit</button>
               <button class="table-action-btn view" data-action="toggle">${j.status==='active'?'Deactivate':'Activate'}</button>
-              <button class="table-action-btn view" data-action="delete">Delete</button>
             </div>
           </td>
         </tr>`;
@@ -163,6 +162,6 @@ window.UserManagementModule = {
     if (!j) return;
     if (action === 'edit') this.openJudgeModal(j);
     else if (action === 'toggle') { j.status = j.status==='active'?'inactive':'active'; j.updated_at = new Date().toISOString(); this.saveJudges(eventId, list); this.loadAndRenderJudges(); }
-    else if (action === 'delete') { const idx = list.findIndex(x => x.id === id); if (idx>=0) { list.splice(idx,1); this.saveJudges(eventId, list); this.loadAndRenderJudges(); } }
+    
   }
 };

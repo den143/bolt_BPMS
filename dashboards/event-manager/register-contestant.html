@@ -9,35 +9,20 @@
 
     <div class="recent-registrations-card">
         <h2 class="section-title">Registered Contestants</h2>
-        
-        <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
-            <div class="input-wrapper" style="flex: 1;">
-                <input type="text" id="searchContestant" class="form-input" placeholder="Search by name...">
-            </div>
-            <div class="input-wrapper" style="width: 200px;">
-                <select id="filterStatus" class="form-input form-select">
-                    <option value="All">All Status</option>
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                </select>
-            </div>
-        </div>
-
         <table class="data-table" id="contestantsTable">
             <thead>
                 <tr>
                     <th>Photo</th>
                     <th>Name</th>
-                    <th>Age</th>
-                    <th>Status</th>
                     <th>Email</th>
+                    <th>Status</th>
                     <th>Contact Number</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody id="contestantsTbody">
                 <tr>
-                    <td colspan="7" class="empty-state">
+                    <td colspan="6" class="empty-state">
                         <div class="empty-state-text">No contestants registered yet</div>
                     </td>
                 </tr>
@@ -48,7 +33,7 @@
 
 <div id="contestantModal" class="modal hidden" role="dialog" aria-labelledby="contestantModalTitle" aria-hidden="true">
     <div class="modal-overlay"></div>
-    <div class="modal-content" style="width:min(95vw, 1100px); max-width:1100px; height:85vh; max-height:85vh; display:flex; flex-direction:column; overflow-y:auto">
+    <div class="modal-content" style="width:min(95vw, 1100px); max-width:1100px; height:85vh; max-height:85vh; display:flex; flex-direction:column; overflow-y:auto;">
         <h3 id="contestantModalTitle" class="modal-title">Add Contestant</h3>
         <form id="contestantForm" class="modal-form" novalidate>
             <div class="modal-body">
@@ -101,7 +86,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <img id="imagePreview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Crect fill='%23ddd' width='200' height='200'/%3E%3Ctext fill='%23555' font-family='sans-serif' font-size='30' dy='10.5' font-weight='bold' x='50%25' y='50%25' text-anchor='middle'%3ENo Image%3C/text%3E%3C/svg%3E" alt="Image Preview" style="max-width: 100%; height: auto; margin-top: 10px;">
+                    <img id="imagePreview" src="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22200%22%20height%3D%22200%22%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22%23cccccc%22/%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%20font-size%3D%2220%22%20fill%3D%22%23333333%22%3ENo%20Image%3C/text%3E%3C/svg%3E" alt="Image Preview" style="max-width: 100%; height: auto; margin-top: 10px;">
                 </div>
             </div>
             <div class="modal-actions">

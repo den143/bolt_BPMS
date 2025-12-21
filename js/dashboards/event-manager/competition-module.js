@@ -484,8 +484,8 @@ window.CompetitionModule = {
     const list = this.loadSegments(evId, r.id);
     this.updatePercentStatus(list);
   },
-
   toggleSegmentActive(id) {
+
     const evId = (this.state.activeEvent && this.state.activeEvent.id) ? this.state.activeEvent.id : 'default';
     const r = this.state.selectedRound;
     if (!r) return;
