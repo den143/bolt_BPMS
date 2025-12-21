@@ -55,6 +55,8 @@ const BPMS = {
             emailError: document.getElementById('emailError'),
             passwordError: document.getElementById('passwordError'),
             roleError: document.getElementById('roleError'),
+            ticketCodeInput: document.getElementById('ticketCode'),
+            ticketCodeError: document.getElementById('ticketCodeError'),
             submitButton: document.querySelector('.submit-button'),
             eyeIcon: document.querySelector('.eye-icon'),
             eyeOffIcon: document.querySelector('.eye-off-icon'),
@@ -106,6 +108,7 @@ const BPMS = {
         if (this.elements.roleInput) {
             this.elements.roleInput.addEventListener('blur', () => this.validateRole());
             this.elements.roleInput.addEventListener('change', () => this.clearError('role'));
+            this.elements.roleInput.addEventListener('change', (e) => this.handleRoleChange(e));
         }
 
         // Keyboard accessibility for modals
@@ -205,6 +208,23 @@ const BPMS = {
         return password && password.length >= minLength;
     },
 
+    handleRoleChange(e) {
+        const role = e.target.value;
+        const ticketCodeGroup = document.getElementById('ticketCodeGroup');
+        const emailGroup = document.getElementById('emailGroup');
+        const passwordGroup = document.getElementById('passwordGroup');
+
+        if (role === 'Audience') {
+            ticketCodeGroup.style.display = 'block';
+            emailGroup.style.display = 'none';
+            passwordGroup.style.display = 'none';
+        } else {
+            ticketCodeGroup.style.display = 'none';
+            emailGroup.style.display = 'block';
+            passwordGroup.style.display = 'block';
+        }
+    },
+
     /**
      * Handle form submission
      * @param {Event} e - Submit event
@@ -216,28 +236,55 @@ const BPMS = {
         if (this.state.isFormSubmitting) {
             return;
         }
+        const role = this.elements.roleInput ? this.elements.roleInput.value : '';
 
-        // Validate all fields
-        const isEmailValid = this.validateEmail();
-        const isPasswordValid = this.validatePassword();
-        const isRoleValid = this.validateRole();
-
-        if (!isEmailValid || !isPasswordValid || !isRoleValid) {
-            return;
+        if(role === 'Audience'){
+            const isTicketCodeValid = this.validateTicketCode();
+            if(!isTicketCodeValid){
+                return;
+            }
         }
+        else{
+            // Validate all fields
+            const isEmailValid = this.validateEmail();
+            const isPasswordValid = this.validatePassword();
+            const isRoleValid = this.validateRole();
+
+            if (!isEmailValid || !isPasswordValid || !isRoleValid) {
+                return;
+            }
+        }
+
 
         // Get form values
         const email = this.elements.emailInput ? this.elements.emailInput.value.trim() : '';
         const password = this.elements.passwordInput ? this.elements.passwordInput.value : '';
-        const role = this.elements.roleInput ? this.elements.roleInput.value : '';
+        const ticketCode = this.elements.ticketCodeInput ? this.elements.ticketCodeInput.value.trim() : '';
+        
 
-        if (!email || !password) {
+        if(role !== 'Audience' && (!email || !password)) {
             console.error('BPMS: Email or password input not found');
             return;
         }
 
         // Authenticate user
-        this.authenticateUser(email, password, role);
+        this.authenticateUser(email, password, role, ticketCode);
+    },
+
+    validateTicketCode() {
+        if (!this.elements.ticketCodeInput) {
+            return false;
+        }
+
+        const ticketCode = this.elements.ticketCodeInput.value.trim();
+
+        if (!ticketCode) {
+            this.showError('ticketCode', 'Ticket code is required');
+            return false;
+        }
+
+        this.clearError('ticketCode');
+        return true;
     },
 
     /**
@@ -367,7 +414,7 @@ const BPMS = {
      * @param {string} password - User password
      * @param {string} role - User role (optional)
      */
-    authenticateUser(email, password, role) {
+    authenticateUser(email, password, role, ticketCode) {
         // Set submitting state
         if (this.elements.submitButton) {
             this.state.isFormSubmitting = true;
@@ -377,20 +424,31 @@ const BPMS = {
 
         // Simulate API call with setTimeout
         setTimeout(() => {
-            // Check against demo accounts (role is required)
-            const account = this.demoAccounts.find(
-                acc => acc.email.toLowerCase() === email.toLowerCase() && 
-                       acc.password === password && 
-                       acc.role.toLowerCase() === role.toLowerCase()
-            );
-
-            if (account) {
-                // Successful login
-                this.handleSuccessfulLogin(account);
-            } else {
-                // Failed login
-                this.handleFailedLogin(email);
+            if(role === 'Audience'){
+                if (ticketCode === 'password123') {
+                    this.handleSuccessfulLogin({role: 'Audience'});
+                } else {
+                    this.handleFailedLogin();
+                    this.showError('ticketCode', 'Invalid ticket code');
+                }
             }
+            else{
+                // Check against demo accounts (role is required)
+                const account = this.demoAccounts.find(
+                    acc => acc.email.toLowerCase() === email.toLowerCase() && 
+                           acc.password === password && 
+                           acc.role.toLowerCase() === role.toLowerCase()
+                );
+
+                if (account) {
+                    // Successful login
+                    this.handleSuccessfulLogin(account);
+                } else {
+                    // Failed login
+                    this.handleFailedLogin(email);
+                }
+            }
+
 
             // Reset submitting state
             this.state.isFormSubmitting = false;
@@ -407,15 +465,20 @@ const BPMS = {
      * @param {Object} account - User account object
      */
     handleSuccessfulLogin(account) {
-        console.log('Login successful:', account.email, 'Role:', account.role);
+        if(account.email){
+            console.log('Login successful:', account.email, 'Role:', account.role);
+            // Store user session in localStorage
+            const session = {
+                email: account.email,
+                role: account.role,
+                loginTime: new Date().toISOString()
+            };
+            localStorage.setItem('bpms_session', JSON.stringify(session));
+        }
+        else{
+            console.log('Login successful: Audience');
+        }
 
-        // Store user session in localStorage
-        const session = {
-            email: account.email,
-            role: account.role,
-            loginTime: new Date().toISOString()
-        };
-        localStorage.setItem('bpms_session', JSON.stringify(session));
 
         // Clear form
         if (this.elements.signinForm) {

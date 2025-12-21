@@ -1071,7 +1071,7 @@ const EventManagerDashboard = {
                 this.renderManageSegmentsView();
                 break;
             case 'manage-awards':
-                this.renderSectionView('Manage Awards', 'Create and manage awards');
+                this.renderManageAwardsView();
                 break;
             case 'register-contestant':
                 this.renderSectionView('Register Contestant', 'Add and manage contestants');
@@ -1165,6 +1165,19 @@ const EventManagerDashboard = {
                 this.elements.otherViews.innerHTML = html;
                 if (window.CompetitionModule && typeof window.CompetitionModule.initSegmentsView === 'function') {
                     window.CompetitionModule.initSegmentsView(this.state.activeEvent);
+                }
+            });
+    },
+
+    renderManageAwardsView() {
+        if (!this.elements.otherViews) return;
+        this.showOtherView('manage-awards');
+        fetch('./manage-awards.html')
+            .then(r => r.text())
+            .then(html => {
+                this.elements.otherViews.innerHTML = html;
+                if (window.AwardsModule && typeof window.AwardsModule.initAwardsView === 'function') {
+                    window.AwardsModule.initAwardsView(this.state.activeEvent);
                 }
             });
     },
