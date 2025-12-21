@@ -3,25 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audience Dashboard - BPMS</title>
-    <link rel="icon" type="image/png" href="../../public/bpms_logo.png">
-    <link rel="stylesheet" href="../../css/style.css">
+    <title>Vote for your Queen | PageantSys</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="audience.css">
 </head>
 <body>
-    <div class="dashboard-container">
-        <div class="dashboard-card">
-            <h1 class="dashboard-title">Audience Dashboard</h1>
-            <p class="dashboard-subtitle">Beauty Pageant Management System</p>
-            <div class="dashboard-message">
-                ✅ Successfully redirected to Audience dashboard
+
+    <header class="public-header">
+        <div class="brand">
+            <img src="../../public/bpms_logo.png" alt="BPMS Logo" class="brand-logo">
+            <div class="brand-text">
+                <div class="brand-title">BPMS</div>
+                <div class="brand-subtitle">Beauty Pageant Management System</div>
             </div>
-            <p style="color: var(--color-text-secondary); margin-bottom: var(--spacing-lg);">
-                You are now viewing the Audience dashboard. This is where you can view events and vote for your favorite contestants.
-            </p>
-            <button class="logout-button" onclick="window.location.href='../../index.html'">Back to Login</button>
+        </div>
+        <button class="logout-btn" onclick="openLogoutModal()">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+    </header>
+
+    <div class="container">
+        
+        <h2 class="section-title">Official Candidates</h2>
+
+        <div class="contestant-grid" id="gridContainer">
+            
+            <div class="card">
+                <div class="card-img-container" onclick="openProfile('Maria Santos', 'San Jose', 'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60')">
+                    <div class="sash-badge">1</div>
+                    <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Candidate" class="card-img">
+                </div>
+                <div class="card-body">
+                    <div>
+                        <div class="card-title">Maria Santos</div>
+                        <div class="card-subtitle">SAN JOSE</div>
+                    </div>
+                    <button class="vote-btn" onclick="castVote(event, this, 'Maria Santos')">
+                        <i class="fas fa-heart"></i> VOTE
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-img-container" onclick="openProfile('Ana Reyes', 'Catarman', 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60')">
+                    <div class="sash-badge">2</div>
+                    <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Candidate" class="card-img">
+                </div>
+                <div class="card-body">
+                    <div>
+                        <div class="card-title">Ana Reyes</div>
+                        <div class="card-subtitle">CATARMAN</div>
+                    </div>
+                    <button class="vote-btn" onclick="castVote(event, this, 'Ana Reyes')">
+                        <i class="fas fa-heart"></i> VOTE
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-img-container" onclick="openProfile('Liza So', 'Manila', 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60')">
+                    <div class="sash-badge">3</div>
+                    <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Candidate" class="card-img">
+                </div>
+                <div class="card-body">
+                    <div>
+                        <div class="card-title">Liza So</div>
+                        <div class="card-subtitle">MANILA</div>
+                    </div>
+                    <button class="vote-btn" onclick="castVote(event, this, 'Liza So')">
+                        <i class="fas fa-heart"></i> VOTE
+                    </button>
+                </div>
+            </div>
+
+             <div class="card">
+                <div class="card-img-container" onclick="openProfile('Bella Cruz', 'Cebu', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60')">
+                    <div class="sash-badge">4</div>
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Candidate" class="card-img">
+                </div>
+                <div class="card-body">
+                    <div>
+                        <div class="card-title">Bella Cruz</div>
+                        <div class="card-subtitle">CEBU</div>
+                    </div>
+                    <button class="vote-btn" onclick="castVote(event, this, 'Bella Cruz')">
+                        <i class="fas fa-heart"></i> VOTE
+                    </button>
+                </div>
+            </div>
+
         </div>
     </div>
+
+    <div class="modal-overlay" id="profileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button onclick="closeModal()" class="modal-close-btn"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div class="modal-body">
+                <img id="m-img" src="" class="modal-profile-img">
+                <h2 id="m-name" class="modal-profile-name">Name</h2>
+                <h4 id="m-city" class="modal-profile-city">City</h4>
+                <p class="modal-quote">
+                    "Advocating for sustainable tourism and youth empowerment through education."
+                </p>
+                <br>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="logoutModal">
+        <div class="modal-content logout-modal-content">
+            <div class="modal-header">
+                <h3 style="margin:0">Confirm Logout</h3>
+                <button onclick="closeLogoutModal()" class="modal-close-btn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to log out?</p>
+                <div class="modal-actions" style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
+                    <button class="btn-cancel" onclick="closeLogoutModal()">Cancel</button>
+                    <button class="btn-confirm" onclick="confirmLogout()">Logout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../js/dashboards/audience/audience.js"></script>
 </body>
 </html>
-

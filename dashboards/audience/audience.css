@@ -1,52 +1,335 @@
-.dashboard-container {
-    min-height: 100vh;
+/* --- CORE VARIABLES (Light/Gold Mode) --- */
+:root {
+    --primary-color: #ffd700; /* Gold */
+    --primary-hover: #ffca28;
+    --accent-color: #ffd700; 
+    --bg-color: #f8f9fa; /* Light Gray Background */
+    --card-bg: #ffffff;
+    --text-light: #333333; /* Dark text for light mode */
+    --text-muted: #6c757d;
+    --input-bg: #ffffff;
+    --border-color: #e9ecef;
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+    --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+    --success-color: #28a745;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+
+body { 
+    background-color: var(--bg-color); 
+    color: var(--text-light);
+    display: flex; 
+    flex-direction: column;
+    min-height: 100vh; 
+}
+
+/* --- HEADER --- */
+.public-header {
+    background: #ffffff;
+    box-shadow: var(--shadow-sm);
+    padding: 15px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.brand { 
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-logo {
+    width: 45px;
+    height: 45px;
+    object-fit: contain;
+}
+
+.brand-text {
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
-    padding: var(--spacing-xl);
-    background-color: var(--color-background);
 }
-.dashboard-card {
-    background-color: var(--color-white);
-    border-radius: var(--radius-xl);
-    padding: var(--spacing-2xl);
-    box-shadow: var(--shadow-lg);
-    max-width: 600px;
+
+.brand-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #333;
+    line-height: 1;
+    letter-spacing: 0.5px;
+}
+
+.brand-subtitle {
+    font-size: 0.75rem;
+    color: #666;
+    margin-top: 3px;
+    font-weight: 500;
+}
+
+.brand i {
+    color: var(--accent-color);
+}
+
+/* --- CONTAINER --- */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
     width: 100%;
+}
+
+.section-title {
+    border-left: 5px solid var(--accent-color);
+    padding-left: 15px;
+    margin-bottom: 25px;
+    font-size: 1.8rem;
+    color: #333;
+}
+
+/* --- GRID --- */
+.contestant-grid {
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
+    gap: 25px; 
+}
+
+.card {
+    background: var(--card-bg); 
+    border-radius: 12px; 
+    overflow: hidden;
+    box-shadow: var(--shadow-sm); 
+    transition: transform 0.2s, box-shadow 0.2s; 
+    position: relative;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+}
+
+.card:hover { 
+    transform: translateY(-5px); 
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent-color);
+}
+
+.card-img { 
+    width: 100%; 
+    height: 280px;
+    object-fit: cover; 
+    filter: brightness(1);
+}
+
+.card:hover .card-img { filter: brightness(1.05); }
+
+.sash-badge {
+    position: absolute; top: 10px; right: 10px;
+    background: var(--accent-color); 
+    color: #fff;
+    width: 40px; height: 40px; 
+    border-radius: 50%;
+    display: flex; justify-content: center; align-items: center;
+    font-weight: 800; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.card-body { padding: 20px 15px; text-align: center; }
+.card-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 5px; color: #333; }
+.card-subtitle { color: var(--text-muted); font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 15px; }
+
+/* Vote Button */
+.vote-btn {
+    background-color: white;
+    border: 2px solid var(--accent-color);
+    color: #bfa000; /* Darker gold for text readability */
+    padding: 8px 20px;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    max-width: 150px;
+}
+
+.vote-btn:hover {
+    background-color: var(--accent-color);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(255, 215, 0, 0.3);
+}
+
+.vote-btn:active {
+    transform: scale(0.95);
+}
+
+/* State: Voted */
+.vote-btn.voted {
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+    color: #fff;
+    cursor: default;
+    box-shadow: none;
+    transform: none;
+}
+
+/* --- MODAL (Read Only Profile) --- */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5); z-index: 1000;
+    display: none; 
+    justify-content: center; align-items: center;
+    backdrop-filter: blur(2px);
+}
+.modal-overlay.active { display: flex; animation: fadeIn 0.3s; }
+
+.modal-content {
+    background: var(--card-bg); 
+    width: 500px; max-width: 90%;
+    border-radius: 12px; overflow: hidden; 
+    border: none;
+    color: #333;
+    box-shadow: var(--shadow-lg);
+}
+
+.modal-header {
+    padding: 20px; background: #fff;
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-close-btn {
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+.modal-close-btn:hover { color: #333; }
+
+.modal-body { padding: 30px; text-align: center; }
+
+.modal-profile-img {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--accent-color);
+    margin-bottom: 25px;
+    box-shadow: var(--shadow-md);
+}
+
+.modal-profile-name {
+    color: #333;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.modal-profile-city {
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 30px;
+    letter-spacing: 2px;
+}
+
+.modal-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    text-align: left;
+}
+
+.stats-pill {
+    background: #f1f3f5; 
+    padding: 8px 15px; 
+    border-radius: 20px;
+    font-size: 0.9rem; 
+    color: #555; 
+    display: inline-block;
     text-align: center;
 }
-.dashboard-title {
-    font-size: var(--font-size-4xl);
-    font-weight: 700;
-    color: var(--color-text-primary);
-    margin-bottom: var(--spacing-md);
+
+.modal-quote {
+    margin-top: 20px;
+    color: #777;
+    font-style: italic;
 }
-.dashboard-subtitle {
-    font-size: var(--font-size-lg);
-    color: var(--color-text-secondary);
-    margin-bottom: var(--spacing-xl);
-}
-.dashboard-message {
-    font-size: var(--font-size-base);
-    color: var(--color-text-primary);
-    background-color: var(--color-primary-light);
-    padding: var(--spacing-md);
-    border-radius: var(--radius-md);
-    margin-bottom: var(--spacing-xl);
-}
-.logout-button {
-    padding: var(--spacing-sm) var(--spacing-lg);
-    font-size: var(--font-size-base);
-    font-weight: 600;
-    color: var(--color-white);
-    background-color: var(--color-primary);
-    border: none;
-    border-radius: var(--radius-md);
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* Hide Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-color); }
+::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+
+/* Logout Button */
+.logout-btn {
+    background: none;
+    border: 2px solid #e9ecef;
+    padding: 8px 16px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: all var(--transition-base);
+    font-size: 0.9rem;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
 }
-.logout-button:hover {
-    background-color: var(--color-primary-dark);
-    transform: translateY(-1px);
+
+.logout-btn:hover {
+    background: #fff0f0;
+    border-color: #ffcccc;
+    color: #dc3545;
+}
+
+/* Logout Modal Specifics */
+.logout-modal-content {
+    width: 400px;
+    max-width: 90%;
+}
+
+.btn-cancel, .btn-confirm {
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+}
+
+.btn-cancel {
+    background: #e9ecef;
+    color: #495057;
+}
+
+.btn-cancel:hover {
+    background: #dee2e6;
+}
+
+.btn-confirm {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-confirm:hover {
+    background: #c82333;
+}
+
+/* Responsive adjustments for the brand */
+@media (max-width: 600px) {
+    .brand-subtitle {
+        display: none;
+    }
+    .brand-title {
+        font-size: 1.4rem;
+    }
+    .brand-logo {
+        width: 35px;
+        height: 35px;
+    }
 }
