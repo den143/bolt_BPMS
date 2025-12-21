@@ -1,0 +1,1 @@
+//combine Organizers and Judges here if their logic is similar.

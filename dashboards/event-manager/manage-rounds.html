@@ -1,0 +1,76 @@
+ <section id="manageRoundsView" class="dashboard-view">
+              <div class="page-header">
+                <div>
+                  <h1 class="event-title">Manage Rounds</h1>
+                  <p class="page-subtitle">Configure competition rounds</p>
+                </div>
+                <button id="createRoundBtn" class="submit-button">Create Round</button>
+              </div>
+
+              <div class="recent-registrations-card">
+                <h2 class="section-title">Rounds</h2>
+                <div id="roundsContainer">
+                  <div class="empty-state">
+                    <div class="empty-state-text">No rounds yet</div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <div id="roundModal" class="modal round-modal hidden" role="dialog" aria-labelledby="roundModalTitle" aria-hidden="true">
+              <div class="modal-overlay"></div>
+              <div class="modal-content">
+                <h3 id="roundModalTitle" class="modal-title">Create Round</h3>
+                <div id="roundError" class="error-message" style="display:none"></div>
+                <form id="roundForm" class="modal-form" novalidate>
+                  <div class="modal-body">
+                    <div class="form-group">
+                      <label for="roundName" class="form-label">Round Name</label>
+                      <div class="input-wrapper">
+                        <input id="roundName" type="text" class="form-input" placeholder="e.g., Preliminary" required>
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="roundDescription" class="form-label">Description (optional)</label>
+                      <div class="input-wrapper">
+                        <textarea id="roundDescription" class="form-input" placeholder="Brief Description" rows="3"></textarea>
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="roundOrder" class="form-label">Round Order</label>
+                      <div class="input-wrapper">
+                        <input id="roundOrder" type="number" min="1" step="1" class="form-input" placeholder="e.g., 1" required>
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="advRule" class="form-label">Advancement Rule</label>
+                      <div class="input-wrapper">
+                        <select id="advRule" class="form-input form-select" required>
+                          <option value="">Select rule</option>
+                          <option value="TopN">Top N Contestants</option>
+                          <option value="Final">Final Round (1)</option>
+                        </select>
+                      </div>
+                      <div class="input-wrapper" id="topNWrapper" style="margin-top:0.5rem; display:none">
+                        <input id="topNCount" type="number" min="1" step="1" class="form-input" placeholder="Enter N (e.g., 5)">
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="form-label">Enable Audience Voting</label>
+                      <div class="input-wrapper">
+                        <label><input id="audienceVoting" type="checkbox"> Audience contributes 20%, judges 80%</label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="modal-actions">
+                    <button type="button" id="cancelRound" class="submit-button secondary-button">Cancel</button>
+                    <button type="submit" class="submit-button">Create Round</button>
+                  </div>
+                </form>
+              </div>
+            </div>`;

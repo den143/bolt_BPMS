@@ -1,0 +1,159 @@
+<section id="manageActivitiesView" class="dashboard-view">
+              <div class="page-header">
+                <div>
+                  <h1 class="event-title">Manage Activities</h1>
+                  <p class="page-subtitle">Create, schedule, and update event activities</p>
+                </div>
+                <button id="addActivityBtn" class="submit-button">Add Activity</button>
+              </div>
+
+              <div class="filters-bar">
+                <input id="activitySearch" class="form-input" type="text" placeholder="Search title or venue">
+                <select id="filterActivityType" class="form-input form-select">
+                  <option value="">All Types</option>
+                  <option value="Photoshoot">Photoshoot</option>
+                  <option value="Rehearsal">Rehearsal</option>
+                  <option value="Briefing">Briefing</option>
+                  <option value="Dinner">Dinner</option>
+                  <option value="Main Event">Main Event</option>
+                  <option value="Custom">Custom</option>
+                </select>
+                <select id="filterActivityStatus" class="form-input form-select">
+                  <option value="">All Status</option>
+                  <option value="Planned">Planned</option>
+                  <option value="Confirmed">Confirmed</option>
+                  <option value="Rescheduled">Rescheduled</option>
+                  <option value="Completed">Completed</option>
+                  <option value="Cancelled">Cancelled</option>
+                </select>
+                <select id="sortActivityBy" class="form-input form-select">
+                  <option value="start_asc">Start Date ↑</option>
+                  <option value="start_desc">Start Date ↓</option>
+                </select>
+              </div>
+
+              <div class="recent-registrations-card">
+                <h2 class="section-title">Activities</h2>
+                <table class="data-table" id="activitiesTable">
+                  <thead>
+                    <tr>
+                      <th>Title</th>
+                      <th>Type</th>
+                      <th>Status</th>
+                      <th>Start</th>
+                      <th>End</th>
+                      <th>Venue</th>
+                      <th>Audience</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="activitiesTbody">
+                    <tr>
+                      <td colspan="8" class="empty-state">
+                        <div class="empty-state-text">No activities yet</div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <div id="activityModal" class="modal activity-modal hidden" role="dialog" aria-labelledby="activityModalTitle" aria-hidden="true">
+              <div class="modal-overlay"></div>
+              <div class="modal-content">
+                <h3 id="activityModalTitle" class="modal-title">Add Activity</h3>
+                <div id="activityConflictWarning" class="error-message" style="display:none"></div>
+                <form id="activityForm" class="modal-form" novalidate>
+                  <div class="modal-body">
+                  <div class="form-group">
+                    <label for="activityType" class="form-label">Activity Type</label>
+                    <div class="input-wrapper">
+                      <select id="activityType" class="form-input form-select" required>
+                        <option value="">Select type</option>
+                        <option value="Photoshoot">Photoshoot</option>
+                        <option value="Rehearsal">Rehearsal</option>
+                        <option value="Briefing">Briefing</option>
+                        <option value="Dinner">Dinner</option>
+                        <option value="Main Event">Main Event</option>
+                        <option value="Custom">Custom</option>
+                      </select>
+                    </div>
+                    <div class="input-wrapper" id="activityTypeCustomWrapper" style="margin-top:0.5rem; display:none">
+                      <input id="activityTypeCustom" type="text" class="form-input" placeholder="Enter custom activity type">
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="activityDescription" class="form-label">Description / Notes</label>
+                    <div class="input-wrapper">
+                      <textarea id="activityDescription" class="form-input" placeholder="Dress code, reminders, instructions" rows="3"></textarea>
+                    </div>
+                  </div>
+
+                  <div class="form-row-grid">
+                    <div class="form-group">
+                      <label for="activityStartDate" class="form-label">Start Date</label>
+                      <div class="input-wrapper">
+                        <input id="activityStartDate" type="date" class="form-input" required>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="activityStartTime" class="form-label">Start Time</label>
+                      <div class="input-wrapper">
+                        <input id="activityStartTime" type="time" class="form-input" required>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-row-grid">
+                    <div class="form-group">
+                      <label for="activityEndDate" class="form-label">End Date</label>
+                      <div class="input-wrapper">
+                        <input id="activityEndDate" type="date" class="form-input" required>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="activityEndTime" class="form-label">End Time</label>
+                      <div class="input-wrapper">
+                        <input id="activityEndTime" type="time" class="form-input" required>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="activityAddress" class="form-label">Address</label>
+                    <div class="input-wrapper">
+                      <input id="activityAddress" type="text" class="form-input" placeholder="Address" required>
+                    </div>
+                  </div>
+
+                  <div class="form-row-grid">
+                    <div class="form-group">
+                      <label for="activityStatus" class="form-label">Status</label>
+                      <div class="input-wrapper">
+                        <select id="activityStatus" class="form-input form-select" required>
+                          <option value="Planned">Planned</option>
+                          <option value="Confirmed">Confirmed</option>
+                          <option value="Rescheduled">Rescheduled</option>
+                          <option value="Completed">Completed</option>
+                          <option value="Cancelled">Cancelled</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Audience</label>
+                      <div class="input-wrapper">
+                        <label style="margin-right:1rem"><input id="audContestants" type="checkbox"> Contestants</label>
+                        <label><input id="audJudges" type="checkbox"> Judges</label>
+                      </div>
+                    </div>
+                  </div>
+                  </div>
+
+                  <div class="modal-actions">
+                    <button type="button" id="cancelActivity" class="submit-button secondary-button">Cancel</button>
+                    <button type="submit" class="submit-button">Save Activity</button>
+                  </div>
+                </form>
+              </div>
+            </div>`;

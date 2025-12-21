@@ -1,0 +1,125 @@
+<section id="manageSegmentsView" class="dashboard-view">
+  <div class="page-header">
+    <div>
+      <h1 class="event-title">Manage Segments & Criteria</h1>
+      <p class="page-subtitle">Select a round, add segments, and define criteria</p>
+    </div>
+    <div class="page-actions">
+      <button id="lockRoundBtn" class="submit-button secondary-button" disabled>Lock Round</button>
+      <button id="addSegmentBtn" class="submit-button" disabled>Add Segment</button>
+    </div>
+  </div>
+
+  <div class="section-block">
+    <h2 class="section-title">Round Selection</h2>
+    <div id="roundSelectionContainer" class="section-content">
+      <div class="form-group">
+        <label for="roundSelect" class="form-label">Select a Round</label>
+        <div class="input-wrapper">
+          <select id="roundSelect" class="form-input form-select">
+            <option value="">Loading rounds...</option>
+          </select>
+        </div>
+      </div>
+      <div id="roundStatusRow" style="margin-top:0.5rem">
+        <span id="roundStatusBadge" class="status-badge pending">-</span>
+      </div>
+      <div id="roundLockMessage" class="error-message" style="display:none; margin-top:0.5rem">This round is locked. Editing is disabled.</div>
+    </div>
+    <div id="noRoundsState" class="empty-state" style="display:none">
+      <div class="empty-state-text">
+        ⚠ No rounds found<br>
+        You must create a round before adding segments and criteria.
+      </div>
+      <button id="goToManageRounds" class="submit-button" style="margin-top:1rem">Go to Manage Rounds</button>
+    </div>
+  </div>
+
+  <div class="recent-registrations-card">
+    <h2 class="section-title">Segments</h2>
+    <table class="data-table" id="segmentsTable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Weight (%)</th>
+          <th>Scoring Method</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="segmentsTbody">
+        <tr>
+          <td colspan="6" class="empty-state">
+            <div class="empty-state-text">No segments yet</div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div id="segmentsPercentStatus" class="info-message" style="margin-top:0.5rem"></div>
+  </div>
+</section>
+
+<div id="segmentModal" class="modal hidden" role="dialog" aria-labelledby="segmentModalTitle" aria-hidden="true">
+  <div class="modal-overlay"></div>
+  <div class="modal-content">
+    <h3 id="segmentModalTitle" class="modal-title">Add Segment</h3>
+    <form id="segmentForm" class="modal-form" novalidate>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="segmentName" class="form-label">Segment Name</label>
+          <div class="input-wrapper">
+            <input id="segmentName" type="text" class="form-input" placeholder="e.g., Swimwear" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="segmentDescription" class="form-label">Description</label>
+          <div class="input-wrapper">
+            <textarea id="segmentDescription" class="form-input" placeholder="Brief description" rows="3"></textarea>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="segmentPercent" class="form-label">Segment Weight (%)</label>
+          <div class="input-wrapper">
+            <input id="segmentPercent" type="number" class="form-input" min="1" max="100" step="1" placeholder="e.g., 20" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="scoringMethod" class="form-label">Scoring Method</label>
+          <div class="input-wrapper">
+            <select id="scoringMethod" class="form-input form-select" required>
+              <option value="Judge">Judge only</option>
+              <option value="Judge+Audience">Judge + Audience</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" id="cancelSegment" class="submit-button secondary-button">Cancel</button>
+        <button type="submit" class="submit-button">Add Segment</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="criteriaModal" class="modal hidden" role="dialog" aria-labelledby="criteriaModalTitle" aria-hidden="true">
+  <div class="modal-overlay"></div>
+  <div class="modal-content" style="width:min(95vw, 1100px); max-width:1100px; height:85vh; max-height:85vh; display:flex; flex-direction:column; overflow-y:auto">
+    <h3 id="criteriaModalTitle" class="modal-title">Define Criteria</h3>
+    <form id="criteriaForm" class="modal-form" novalidate>
+      <div class="modal-body">
+        <div id="criteriaList" class="criteria-list"></div>
+        <button type="button" id="addCriteriaRow" class="submit-button secondary-button" style="margin-top:0.5rem">Add Criterion</button>
+        <div id="criteriaTotal" class="info-message" style="margin-top:0.5rem"></div>
+        <div id="criteriaError" class="error-message" style="display:none; margin-top:0.5rem"></div>
+      </div>
+      <div class="modal-actions" style="flex:0 0 auto; background:#fff; padding-top:0.5rem; border-top:1px solid #eee; position:sticky; bottom:0">
+        <button type="button" id="cancelCriteria" class="submit-button secondary-button">Cancel</button>
+        <button type="submit" class="submit-button">Save Criteria</button>
+      </div>
+    </form>
+  </div>
+  </div>

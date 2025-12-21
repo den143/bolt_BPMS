@@ -1068,7 +1068,7 @@ const EventManagerDashboard = {
                 this.renderManageRoundsView();
                 break;
             case 'manage-segments':
-                this.renderSectionView('Manage Segments and Criteria', 'Define segments and scoring criteria');
+                this.renderManageSegmentsView();
                 break;
             case 'manage-awards':
                 this.renderSectionView('Manage Awards', 'Create and manage awards');
@@ -1135,254 +1135,38 @@ const EventManagerDashboard = {
     renderManageActivitiesView() {
         if (!this.elements.otherViews) return;
         this.showOtherView('manage-activities');
-        const html = `
-            <section id="manageActivitiesView" class="dashboard-view">
-              <div class="page-header">
-                <div>
-                  <h1 class="event-title">Manage Activities</h1>
-                  <p class="page-subtitle">Create, schedule, and update event activities</p>
-                </div>
-                <button id="addActivityBtn" class="submit-button">Add Activity</button>
-              </div>
-
-              <div class="filters-bar">
-                <input id="activitySearch" class="form-input" type="text" placeholder="Search title or venue">
-                <select id="filterActivityType" class="form-input form-select">
-                  <option value="">All Types</option>
-                  <option value="Photoshoot">Photoshoot</option>
-                  <option value="Rehearsal">Rehearsal</option>
-                  <option value="Briefing">Briefing</option>
-                  <option value="Dinner">Dinner</option>
-                  <option value="Main Event">Main Event</option>
-                  <option value="Custom">Custom</option>
-                </select>
-                <select id="filterActivityStatus" class="form-input form-select">
-                  <option value="">All Status</option>
-                  <option value="Planned">Planned</option>
-                  <option value="Confirmed">Confirmed</option>
-                  <option value="Rescheduled">Rescheduled</option>
-                  <option value="Completed">Completed</option>
-                  <option value="Cancelled">Cancelled</option>
-                </select>
-                <select id="sortActivityBy" class="form-input form-select">
-                  <option value="start_asc">Start Date ↑</option>
-                  <option value="start_desc">Start Date ↓</option>
-                </select>
-              </div>
-
-              <div class="recent-registrations-card">
-                <h2 class="section-title">Activities</h2>
-                <table class="data-table" id="activitiesTable">
-                  <thead>
-                    <tr>
-                      <th>Title</th>
-                      <th>Type</th>
-                      <th>Status</th>
-                      <th>Start</th>
-                      <th>End</th>
-                      <th>Venue</th>
-                      <th>Audience</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody id="activitiesTbody">
-                    <tr>
-                      <td colspan="8" class="empty-state">
-                        <div class="empty-state-text">No activities yet</div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </section>
-
-            <div id="activityModal" class="modal activity-modal hidden" role="dialog" aria-labelledby="activityModalTitle" aria-hidden="true">
-              <div class="modal-overlay"></div>
-              <div class="modal-content">
-                <h3 id="activityModalTitle" class="modal-title">Add Activity</h3>
-                <div id="activityConflictWarning" class="error-message" style="display:none"></div>
-                <form id="activityForm" class="modal-form" novalidate>
-                  <div class="modal-body">
-                  <div class="form-group">
-                    <label for="activityType" class="form-label">Activity Type</label>
-                    <div class="input-wrapper">
-                      <select id="activityType" class="form-input form-select" required>
-                        <option value="">Select type</option>
-                        <option value="Photoshoot">Photoshoot</option>
-                        <option value="Rehearsal">Rehearsal</option>
-                        <option value="Briefing">Briefing</option>
-                        <option value="Dinner">Dinner</option>
-                        <option value="Main Event">Main Event</option>
-                        <option value="Custom">Custom</option>
-                      </select>
-                    </div>
-                    <div class="input-wrapper" id="activityTypeCustomWrapper" style="margin-top:0.5rem; display:none">
-                      <input id="activityTypeCustom" type="text" class="form-input" placeholder="Enter custom activity type">
-                    </div>
-                  </div>
-
-                  <div class="form-group">
-                    <label for="activityDescription" class="form-label">Description / Notes</label>
-                    <div class="input-wrapper">
-                      <textarea id="activityDescription" class="form-input" placeholder="Dress code, reminders, instructions" rows="3"></textarea>
-                    </div>
-                  </div>
-
-                  <div class="form-row-grid">
-                    <div class="form-group">
-                      <label for="activityStartDate" class="form-label">Start Date</label>
-                      <div class="input-wrapper">
-                        <input id="activityStartDate" type="date" class="form-input" required>
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <label for="activityStartTime" class="form-label">Start Time</label>
-                      <div class="input-wrapper">
-                        <input id="activityStartTime" type="time" class="form-input" required>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="form-row-grid">
-                    <div class="form-group">
-                      <label for="activityEndDate" class="form-label">End Date</label>
-                      <div class="input-wrapper">
-                        <input id="activityEndDate" type="date" class="form-input" required>
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <label for="activityEndTime" class="form-label">End Time</label>
-                      <div class="input-wrapper">
-                        <input id="activityEndTime" type="time" class="form-input" required>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="form-group">
-                    <label for="activityAddress" class="form-label">Address</label>
-                    <div class="input-wrapper">
-                      <input id="activityAddress" type="text" class="form-input" placeholder="Address" required>
-                    </div>
-                  </div>
-
-                  <div class="form-row-grid">
-                    <div class="form-group">
-                      <label for="activityStatus" class="form-label">Status</label>
-                      <div class="input-wrapper">
-                        <select id="activityStatus" class="form-input form-select" required>
-                          <option value="Planned">Planned</option>
-                          <option value="Confirmed">Confirmed</option>
-                          <option value="Rescheduled">Rescheduled</option>
-                          <option value="Completed">Completed</option>
-                          <option value="Cancelled">Cancelled</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <label class="form-label">Audience</label>
-                      <div class="input-wrapper">
-                        <label style="margin-right:1rem"><input id="audContestants" type="checkbox"> Contestants</label>
-                        <label><input id="audJudges" type="checkbox"> Judges</label>
-                      </div>
-                    </div>
-                  </div>
-                  </div>
-
-                  <div class="modal-actions">
-                    <button type="button" id="cancelActivity" class="submit-button secondary-button">Cancel</button>
-                    <button type="submit" class="submit-button">Save Activity</button>
-                  </div>
-                </form>
-              </div>
-            </div>`;
-        this.elements.otherViews.innerHTML = html;
-        this.attachManageActivitiesHandlers();
-        this.loadAndRenderActivities();
+        fetch('./manage-activities.html')
+            .then(r => r.text())
+            .then(html => {
+                this.elements.otherViews.innerHTML = html;
+                this.attachManageActivitiesHandlers();
+                this.loadAndRenderActivities();
+            });
     },
 
     renderManageRoundsView() {
         if (!this.elements.otherViews) return;
         this.showOtherView('manage-rounds');
-        const html = `
-            <section id="manageRoundsView" class="dashboard-view">
-              <div class="page-header">
-                <div>
-                  <h1 class="event-title">Manage Rounds</h1>
-                  <p class="page-subtitle">Configure competition rounds</p>
-                </div>
-                <button id="createRoundBtn" class="submit-button">Create Round</button>
-              </div>
+        fetch('./manage-rounds.html')
+            .then(r => r.text())
+            .then(html => {
+                this.elements.otherViews.innerHTML = html;
+                this.attachManageRoundsHandlers();
+                this.renderRoundsList();
+            });
+    },
 
-              <div class="recent-registrations-card">
-                <h2 class="section-title">Rounds</h2>
-                <div id="roundsContainer">
-                  <div class="empty-state">
-                    <div class="empty-state-text">No rounds yet</div>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <div id="roundModal" class="modal round-modal hidden" role="dialog" aria-labelledby="roundModalTitle" aria-hidden="true">
-              <div class="modal-overlay"></div>
-              <div class="modal-content">
-                <h3 id="roundModalTitle" class="modal-title">Create Round</h3>
-                <div id="roundError" class="error-message" style="display:none"></div>
-                <form id="roundForm" class="modal-form" novalidate>
-                  <div class="modal-body">
-                    <div class="form-group">
-                      <label for="roundName" class="form-label">Round Name</label>
-                      <div class="input-wrapper">
-                        <input id="roundName" type="text" class="form-input" placeholder="e.g., Swimsuit" required>
-                      </div>
-                    </div>
-
-                    <div class="form-group">
-                      <label for="roundDescription" class="form-label">Description (optional)</label>
-                      <div class="input-wrapper">
-                        <textarea id="roundDescription" class="form-input" placeholder="Notes or instructions" rows="3"></textarea>
-                      </div>
-                    </div>
-
-                    <div class="form-group">
-                      <label for="roundOrder" class="form-label">Round Order</label>
-                      <div class="input-wrapper">
-                        <input id="roundOrder" type="number" min="1" step="1" class="form-input" placeholder="e.g., 1" required>
-                      </div>
-                    </div>
-
-                    <div class="form-group">
-                      <label for="advRule" class="form-label">Advancement Rule</label>
-                      <div class="input-wrapper">
-                        <select id="advRule" class="form-input form-select" required>
-                          <option value="">Select rule</option>
-                          <option value="TopN">Top N Contestants</option>
-                          <option value="Final">Final Round (1)</option>
-                        </select>
-                      </div>
-                      <div class="input-wrapper" id="topNWrapper" style="margin-top:0.5rem; display:none">
-                        <input id="topNCount" type="number" min="1" step="1" class="form-input" placeholder="Enter N (e.g., 5)">
-                      </div>
-                    </div>
-
-                    <div class="form-group">
-                      <label class="form-label">Enable Audience Voting</label>
-                      <div class="input-wrapper">
-                        <label><input id="audienceVoting" type="checkbox"> Audience contributes 20%, judges 80%</label>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="modal-actions">
-                    <button type="button" id="cancelRound" class="submit-button secondary-button">Cancel</button>
-                    <button type="submit" class="submit-button">Create Round</button>
-                  </div>
-                </form>
-              </div>
-            </div>`;
-        this.elements.otherViews.innerHTML = html;
-        this.attachManageRoundsHandlers();
-        this.renderRoundsList();
+    renderManageSegmentsView() {
+        if (!this.elements.otherViews) return;
+        this.showOtherView('manage-segments');
+        fetch('./manage-segments-and-criteria.html')
+            .then(r => r.text())
+            .then(html => {
+                this.elements.otherViews.innerHTML = html;
+                if (window.CompetitionModule && typeof window.CompetitionModule.initSegmentsView === 'function') {
+                    window.CompetitionModule.initSegmentsView(this.state.activeEvent);
+                }
+            });
     },
 
     attachManageRoundsHandlers() {
@@ -1404,6 +1188,7 @@ const EventManagerDashboard = {
     openRoundModal() {
         const modal = document.getElementById('roundModal');
         if (!modal) return;
+        this.setRoundModalAdd();
         modal.classList.remove('hidden');
         modal.setAttribute('aria-hidden', 'false');
         const nameEl = document.getElementById('roundName');
@@ -1501,6 +1286,7 @@ const EventManagerDashboard = {
         const action = btn.getAttribute('data-action');
         if (action === 'edit') this.openRoundEditModal(id);
         else if (action === 'toggle-lock') this.toggleRoundLock(id);
+        else if (action === 'toggle-active') this.toggleRoundActive(id);
     },
 
     toggleRoundLock(id) {
@@ -1510,6 +1296,18 @@ const EventManagerDashboard = {
         const r = list.find(x => x.id === id);
         if (!r) return;
         r.status = (r.status === 'Locked') ? 'Draft' : 'Locked';
+        r.updated_at = new Date().toISOString();
+        localStorage.setItem(key, JSON.stringify(list));
+        this.renderRoundsList();
+    },
+
+    toggleRoundActive(id) {
+        const event = this.state.activeEvent;
+        const key = this.getRoundsKey(event && event.id ? event.id : 'default');
+        const list = this.loadRoundsRaw(key);
+        const r = list.find(x => x.id === id);
+        if (!r) return;
+        r.active = r.active === false ? true : false;
         r.updated_at = new Date().toISOString();
         localStorage.setItem(key, JSON.stringify(list));
         this.renderRoundsList();
@@ -1564,6 +1362,7 @@ const EventManagerDashboard = {
             top_n: ruleSel.value === 'TopN' ? parseInt(topNEl.value,10) : 1,
             audience_voting: !!(audienceEl && audienceEl.checked),
             weights: !!(audienceEl && audienceEl.checked) ? { judge: 0.8, audience: 0.2 } : { judge: 1, audience: 0 },
+            active: true,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
             event_id: event && event.id ? event.id : 'event_default'
@@ -1593,9 +1392,12 @@ const EventManagerDashboard = {
             .map(r => {
                 const adv = r.advancement_rule === 'TopN' ? `Top ${r.top_n}` : 'Final (1)';
                 const aud = r.audience_voting ? 'Enabled' : 'Disabled';
-                const statusClass = r.status === 'Locked' ? 'approved' : (r.status === 'Draft' ? 'pending' : 'approved');
-                const statusBadge = `<span class="status-badge ${statusClass}">${r.status||'Draft'}</span>`;
+                const isActive = r.active !== false;
+                const statusText = isActive ? (r.status || 'Draft') : 'Deactivated';
+                const statusClass = !isActive ? 'rejected' : (r.status === 'Locked' ? 'approved' : (r.status === 'Draft' ? 'pending' : 'approved'));
+                const statusBadge = `<span class="status-badge ${statusClass}">${statusText}</span>`;
                 const lockLabel = r.status === 'Locked' ? 'Unlock' : 'Lock';
+                const toggleLabel = isActive ? 'Deactivate' : 'Activate';
                 return `<tr data-id="${r.id}">
                   <td>${r.name}</td>
                   <td>${r.order}</td>
@@ -1606,6 +1408,7 @@ const EventManagerDashboard = {
                     <div class="row-actions">
                       <button class="table-action-btn view" data-action="edit">Edit</button>
                       <button class="table-action-btn view" data-action="toggle-lock">${lockLabel}</button>
+                      <button class="table-action-btn view" data-action="toggle-active">${toggleLabel}</button>
                     </div>
                   </td>
                 </tr>`;
@@ -2114,104 +1917,14 @@ const EventManagerDashboard = {
 
     renderManageOrganizersView() {
         if (!this.elements.otherViews) return;
-        const html = `
-            <section id="manageOrganizersView" class="dashboard-view">
-              <div class="page-header">
-                <div>
-                  <h1 class="event-title">Manage Organizers</h1>
-                  <p class="page-subtitle">Assign and manage Judge Coordinator, Contestant Manager, and Tabulator</p>
-                </div>
-                <button id="addOrganizerBtn" class="submit-button">Add New Organizer</button>
-              </div>
-
-              <div class="filters-bar">
-                <input id="organizerSearch" class="form-input" type="text" placeholder="Search name or email">
-                <select id="filterStatus" class="form-input form-select">
-                  <option value="">All Status</option>
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                  <option value="pending">Pending</option>
-                </select>
-              </div>
-
-              
-
-              <div class="recent-registrations-card">
-                <h2 class="section-title">Organizers</h2>
-                <table class="data-table" id="organizersTable">
-                  <thead>
-                    <tr>
-                      <th>Avatar</th>
-                      <th>Name/Email</th>
-                      <th>Role</th>
-                      <th>Status</th>
-                      <th>Date Added</th>
-                      <th>Last Login</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody id="organizersTbody">
-                    <tr>
-                      <td colspan="7" class="empty-state">
-                        <div class="empty-state-text">No organizers yet</div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </section>
-
-            <div id="organizerModal" class="modal organizer-modal hidden" role="dialog" aria-labelledby="organizerModalTitle" aria-hidden="true">
-              <div class="modal-overlay"></div>
-              <div class="modal-content">
-                <h3 id="organizerModalTitle" class="modal-title">Add Organizer</h3>
-                <form id="organizerForm" class="modal-form" novalidate>
-                  <div class="form-group">
-                    <label for="organizerRole" class="form-label">Organizer Type</label>
-                    <div class="input-wrapper">
-                      <select id="organizerRole" class="form-input form-select" required>
-                        <option value="">Select type</option>
-                        <option value="Judge Coordinator">Judge Coordinator</option>
-                        <option value="Contestant Manager">Contestant Manager</option>
-                        <option value="Tabulator">Tabulator</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div class="form-group">
-                    <label for="organizerEmail" class="form-label">Email Address</label>
-                    <div class="input-wrapper">
-                      <input id="organizerEmail" type="email" class="form-input" placeholder="name@example.com" required>
-                    </div>
-                    <span class="error-message" id="organizerEmailError"></span>
-                  </div>
-
-                  <div class="form-group">
-                    <label for="organizerPassword" class="form-label">Temporary Password</label>
-                    <div class="input-wrapper">
-                      <input id="organizerPassword" type="password" class="form-input" placeholder="Minimum 8 characters" required>
-                      <button type="button" id="togglePassword" class="toggle-password">👁</button>
-                    </div>
-                    <div id="passwordStrength" class="error-message"></div>
-                    <button type="button" id="generatePassword" class="submit-button secondary-button">Generate Password</button>
-                  </div>
-
-                  <div class="form-group">
-                    <label class="form-label">
-                      <input type="checkbox" id="sendCredentials" disabled> Send credentials via email
-                    </label>
-                  </div>
-
-                  <div class="modal-actions">
-                    <button type="button" id="cancelOrganizer" class="submit-button secondary-button">Cancel</button>
-                    <button type="submit" class="submit-button">Add Organizer</button>
-                  </div>
-                </form>
-              </div>
-            </div>`;
-        this.elements.otherViews.innerHTML = html;
-        this.attachManageOrganizersHandlers();
-        this.loadAndRenderOrganizers();
+        this.showOtherView('manage-organizers');
+        fetch('./manage-organizers.html')
+            .then(r => r.text())
+            .then(html => {
+                this.elements.otherViews.innerHTML = html;
+                this.attachManageOrganizersHandlers();
+                this.loadAndRenderOrganizers();
+            });
     },
 
     attachManageOrganizersHandlers() {
@@ -2223,8 +1936,13 @@ const EventManagerDashboard = {
         const generateBtn = document.getElementById('generatePassword');
         const form = document.getElementById('organizerForm');
         const search = document.getElementById('organizerSearch');
+        const filterRole = document.getElementById('filterRole');
         const filterStatus = document.getElementById('filterStatus');
         const sortBy = document.getElementById('sortBy');
+        const selectAll = document.getElementById('selectAllOrganizers');
+        const bulkActivate = document.getElementById('bulkActivate');
+        const bulkDeactivate = document.getElementById('bulkDeactivate');
+        const bulkDelete = document.getElementById('bulkDelete');
 
         if (addBtn) addBtn.addEventListener('click', () => this.openOrganizerModal());
         if (overlay) overlay.addEventListener('click', () => this.closeOrganizerModal());
@@ -2233,8 +1951,13 @@ const EventManagerDashboard = {
         if (generateBtn) generateBtn.addEventListener('click', () => this.fillGeneratedPassword());
         if (form) form.addEventListener('submit', (e) => this.handleOrganizerSubmit(e));
         if (search) search.addEventListener('input', () => this.loadAndRenderOrganizers());
+        if (filterRole) filterRole.addEventListener('change', () => this.loadAndRenderOrganizers());
         if (filterStatus) filterStatus.addEventListener('change', () => this.loadAndRenderOrganizers());
         if (sortBy) sortBy.addEventListener('change', () => this.loadAndRenderOrganizers());
+        if (selectAll) selectAll.addEventListener('change', (e) => this.toggleSelectAll(e.target.checked));
+        if (bulkActivate) bulkActivate.addEventListener('click', () => this.bulkUpdateStatus('active'));
+        if (bulkDeactivate) bulkDeactivate.addEventListener('click', () => this.bulkUpdateStatus('inactive'));
+        if (bulkDelete) bulkDelete.addEventListener('click', () => this.bulkDelete());
         const tbody = document.getElementById('organizersTbody');
         if (tbody) tbody.addEventListener('click', (e) => this.handleTableClick(e));
     },
@@ -2380,12 +2103,15 @@ const EventManagerDashboard = {
     applyOrganizersFilters(list) {
         const search = document.getElementById('organizerSearch');
         const status = document.getElementById('filterStatus');
+        const roleSel = document.getElementById('filterRole');
         const sortBy = document.getElementById('sortBy');
         let res = list.slice();
         const s = search && search.value ? search.value.toLowerCase() : '';
         if (s) {
             res = res.filter(o => (o.email && o.email.toLowerCase().includes(s)));
         }
+        const role = roleSel && roleSel.value ? roleSel.value : '';
+        if (role) res = res.filter(o => o.role === role);
         const st = status && status.value ? status.value : '';
         if (st) res = res.filter(o => o.status === st);
         const sort = sortBy ? sortBy.value : 'date_desc';
@@ -2404,7 +2130,7 @@ const EventManagerDashboard = {
         const tbody = document.getElementById('organizersTbody');
         if (!tbody) return;
         if (!list || list.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="7" class="empty-state"><div class="empty-state-text">No organizers yet</div></td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="8" class="empty-state"><div class="empty-state-text">No organizers yet</div></td></tr>`;
             return;
         }
         const rows = list.map(o => {
@@ -2416,6 +2142,7 @@ const EventManagerDashboard = {
             const lastLogin = o.last_login ? new Date(o.last_login).toLocaleDateString() : '-';
             return `
                 <tr data-id="${o.id}">
+                  <td><input type="checkbox" class="row-select"></td>
                   <td><div class="avatar">${initials}</div></td>
                   <td>${o.email}</td>
                   <td>${roleBadge}</td>
@@ -2431,6 +2158,7 @@ const EventManagerDashboard = {
                 </tr>`;
         }).join('');
         tbody.innerHTML = rows;
+        Array.from(tbody.querySelectorAll('.row-select')).forEach(cb => cb.addEventListener('change', () => this.updateBulkActionsVisibility()));
     },
 
     handleTableClick(e) {
