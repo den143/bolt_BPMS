@@ -253,12 +253,10 @@ window.AwardsModule = {
       if (vScope !== 'Segment' || !segSel || !segSel.value) { if (err) { err.textContent = 'Automatic awards must be linked to a segment.'; err.style.display = ''; } return; }
     }
     if (vType === 'Audience') {
+      const validScope = !!(vScope && vScope !== 'Event');
       const rid = roundSel ? roundSel.value : '';
-      const roundsRaw = localStorage.getItem('bpms_rounds_' + eventId);
-      let rounds = []; try { rounds = roundsRaw ? JSON.parse(roundsRaw) : []; } catch(e) { rounds = []; }
-      const r = rounds.find(x => x.id === rid);
-      const enabled = !!(r && r.audience_voting);
-      if (!enabled) { if (err) { err.textContent = 'Audience voting is not enabled for selected scope.'; err.style.display = ''; } return; }
+      if (!validScope) { if (err) { err.textContent = 'Audience awards must be linked to a round or segment.'; err.style.display = ''; } return; }
+      if (!rid) { if (err) { err.textContent = 'Select a round for Audience awards.'; err.style.display = ''; } return; }
     }
     const form = document.getElementById('awardForm');
     const mode = form ? form.getAttribute('data-mode') : 'add';

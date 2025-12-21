@@ -1,11 +1,20 @@
 <section id="registerContestantView" class="dashboard-view">
-  <div class="page-header">
-    <div>
-      <h1 class="event-title">Register Contestant</h1>
-      <p class="page-subtitle">Add and manage contestants for the event</p>
+    <div class="page-header">
+        <div>
+            <h1 class="event-title">Register Contestant</h1>
+            <p class="page-subtitle">Add and manage contestants for the event</p>
+        </div>
+        <button id="addContestantBtn" class="submit-button">Add Contestant</button>
     </div>
-    <button id="addContestantBtn" class="submit-button">Add Contestant</button>
-  </div>
+
+    <div class="filters-bar">
+        <input id="contestantSearch" class="form-input" type="text" placeholder="Search by name or email">
+        <select id="filterContestantStatus" class="form-input form-select">
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+        </select>
+    </div>
 
   <div class="filters-bar">
     <input id="contestantSearch" class="form-input" type="text" placeholder="Search by name or email">

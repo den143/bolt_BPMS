@@ -2,7 +2,7 @@
   <div class="page-header">
     <div>
       <h1 class="event-title">Manage Awards</h1>
-      <p class="page-subtitle">Create awards and assign winners</p>
+      <p class="page-subtitle">Create and manage event awards</p>
     </div>
     <button id="addAwardBtn" class="submit-button">Add Award</button>
   </div>
@@ -38,7 +38,7 @@
           <th>Name</th>
           <th>Type</th>
           <th>Scope</th>
-          <th>Rule</th>
+          <th>Rules</th>
           <th>Status</th>
           <th>Actions</th>
         </tr>
@@ -56,7 +56,7 @@
 
 <div id="awardModal" class="modal hidden" role="dialog" aria-labelledby="awardModalTitle" aria-hidden="true">
   <div class="modal-overlay"></div>
-  <div class="modal-content" style="width:min(95vw, 720px)">
+  <div class="modal-content" style="width:min(95vw, 900px); max-width:900px; height:85vh; max-height:85vh; display:flex; flex-direction:column; overflow-y:auto;">
     <h3 id="awardModalTitle" class="modal-title">Add Award</h3>
     <div id="awardError" class="error-message" style="display:none"></div>
     <form id="awardForm" class="modal-form" novalidate>
@@ -64,14 +64,14 @@
         <div class="form-group">
           <label for="awardName" class="form-label">Award Name</label>
           <div class="input-wrapper">
-            <input id="awardName" type="text" class="form-input" placeholder="e.g., Best in Talent" required>
+            <input id="awardName" type="text" class="form-input" placeholder="e.g., Best in Evening Gown" required>
           </div>
         </div>
 
         <div class="form-group">
-          <label for="awardDescription" class="form-label">Description (optional)</label>
+          <label for="awardDescription" class="form-label">Description</label>
           <div class="input-wrapper">
-            <textarea id="awardDescription" class="form-input" rows="3" placeholder="Brief description"></textarea>
+            <textarea id="awardDescription" class="form-input" placeholder="Short description (optional)"></textarea>
           </div>
         </div>
 
@@ -119,25 +119,29 @@
           </div>
         </div>
 
-        <div id="automaticSettings" style="display:none; margin-top:0.5rem">
+        <div id="automaticSettings" style="display:none">
           <div class="form-group">
-            <label class="form-label">Automatic Settings</label>
+            <label class="form-label">Tie Handling</label>
             <div class="input-wrapper">
-              <label class="form-label"><input type="checkbox" id="autoAllowMultiple"> Allow multiple in tie</label>
+              <label style="display:flex; align-items:center; gap:0.5rem">
+                <input type="checkbox" id="autoAllowMultiple"> Allow multiple winners on tie
+              </label>
             </div>
           </div>
         </div>
 
-        <div id="audienceSettings" style="display:none; margin-top:0.5rem">
+        <div id="audienceSettings" style="display:none">
           <div class="form-group">
-            <label class="form-label">Audience Settings</label>
+            <label class="form-label">Tie Handling</label>
             <div class="input-wrapper">
-              <label class="form-label"><input type="checkbox" id="audAllowMultiple"> Allow multiple in tie</label>
+              <label style="display:flex; align-items:center; gap:0.5rem">
+                <input type="checkbox" id="audAllowMultiple"> Allow multiple winners on tie
+              </label>
             </div>
           </div>
         </div>
 
-        <div id="manualSettings" style="display:none; margin-top:0.5rem">
+        <div id="manualSettings" style="display:none">
           <div class="form-group">
             <label for="manualWinners" class="form-label">Select Winners</label>
             <div class="input-wrapper">
@@ -147,14 +151,14 @@
           <div class="form-group">
             <label for="manualJustification" class="form-label">Justification</label>
             <div class="input-wrapper">
-              <textarea id="manualJustification" class="form-input" rows="3" placeholder="Reason for manual selection"></textarea>
+              <textarea id="manualJustification" class="form-input" placeholder="Optional reasoning for manual selection"></textarea>
             </div>
           </div>
         </div>
       </div>
       <div class="modal-actions">
-        <button type="button" id="cancelAward" class="submit-button secondary-button">Cancel</button>
         <button type="submit" class="submit-button">Save Award</button>
+        <button type="button" id="cancelAward" class="submit-button">Cancel</button>
       </div>
     </form>
   </div>
@@ -162,11 +166,11 @@
 
 <div id="awardWinnersModal" class="modal hidden" role="dialog" aria-labelledby="awardWinnersTitle" aria-hidden="true">
   <div class="modal-overlay"></div>
-  <div class="modal-content" style="width:min(95vw, 720px)">
+  <div class="modal-content">
     <h3 id="awardWinnersTitle" class="modal-title">Award Winners</h3>
-    <div id="awardWinnersBody"></div>
+    <div id="awardWinnersBody" class="modal-form"></div>
     <div class="modal-actions">
-      <button type="button" id="closeWinners" class="submit-button secondary-button">Close</button>
+      <button type="button" id="closeWinners" class="submit-button">Close</button>
     </div>
   </div>
-</div>
+  </div>
