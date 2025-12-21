@@ -1080,7 +1080,7 @@ const EventManagerDashboard = {
                 this.renderRegisterJudgeView();
                 break;
             case 'result-panel':
-                this.renderSectionView('Result Panel', 'View results and rankings');
+                this.renderResultPanelView();
                 break;
             default:
                 console.log('Unknown navigation target:', navTarget);
@@ -1192,6 +1192,19 @@ const EventManagerDashboard = {
                 this.elements.otherViews.innerHTML = html;
                 if (window.AwardsModule && typeof window.AwardsModule.initAwardsView === 'function') {
                     window.AwardsModule.initAwardsView(this.state.activeEvent);
+                }
+            });
+    },
+
+    renderResultPanelView() {
+        if (!this.elements.otherViews) return;
+        this.showOtherView('result-panel');
+        fetch('./result-panel.html')
+            .then(r => r.text())
+            .then(html => {
+                this.elements.otherViews.innerHTML = html;
+                if (window.ScoringModule && typeof window.ScoringModule.init === 'function') {
+                    window.ScoringModule.init(this.state.activeEvent ? this.state.activeEvent : null);
                 }
             });
     },
@@ -1424,7 +1437,6 @@ const EventManagerDashboard = {
         const container = document.getElementById('roundsContainer');
         if (!container) return;
         if (!list || list.length === 0) {
-                const isActive = r.active !== false;
             container.innerHTML = `<div class="empty-state"><div class="empty-state-text">No rounds yet</div></div>`;
             return;
         }
