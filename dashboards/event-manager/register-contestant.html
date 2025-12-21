@@ -1,0 +1,113 @@
+<section id="registerContestantView" class="dashboard-view">
+    <div class="page-header">
+        <div>
+            <h1 class="event-title">Register Contestant</h1>
+            <p class="page-subtitle">Add and manage contestants for the event</p>
+        </div>
+        <button id="addContestantBtn" class="submit-button">Add Contestant</button>
+    </div>
+
+    <div class="recent-registrations-card">
+        <h2 class="section-title">Registered Contestants</h2>
+        
+        <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+            <div class="input-wrapper" style="flex: 1;">
+                <input type="text" id="searchContestant" class="form-input" placeholder="Search by name...">
+            </div>
+            <div class="input-wrapper" style="width: 200px;">
+                <select id="filterStatus" class="form-input form-select">
+                    <option value="All">All Status</option>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+            </div>
+        </div>
+
+        <table class="data-table" id="contestantsTable">
+            <thead>
+                <tr>
+                    <th>Photo</th>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Status</th>
+                    <th>Email</th>
+                    <th>Contact Number</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="contestantsTbody">
+                <tr>
+                    <td colspan="7" class="empty-state">
+                        <div class="empty-state-text">No contestants registered yet</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<div id="contestantModal" class="modal hidden" role="dialog" aria-labelledby="contestantModalTitle" aria-hidden="true">
+    <div class="modal-overlay"></div>
+    <div class="modal-content" style="width:min(95vw, 1100px); max-width:1100px; height:85vh; max-height:85vh; display:flex; flex-direction:column; overflow-y:auto">
+        <h3 id="contestantModalTitle" class="modal-title">Add Contestant</h3>
+        <form id="contestantForm" class="modal-form" novalidate>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="firstName" class="form-label">First Name</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="firstName" name="firstName" class="form-input" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="lastName" class="form-label">Last Name</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="lastName" name="lastName" class="form-input" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="dob" class="form-label">Date of Birth</label>
+                    <div class="input-wrapper">
+                        <input type="date" id="dob" name="dob" class="form-input" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="email" class="form-label">Email</label>
+                    <div class="input-wrapper">
+                        <input type="email" id="email" name="email" class="form-input" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="contactNumber" class="form-label">Contact Number</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="contactNumber" name="contactNumber" class="form-input" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="address" class="form-label">Address</label>
+                    <div class="input-wrapper">
+                        <textarea id="address" name="address" class="form-input" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="tempPassword" class="form-label">Temporary Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="tempPassword" name="tempPassword" class="form-input" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="photo" class="form-label">Photo (JPG/PNG, max 5MB)</label>
+                    <div class="input-wrapper">
+                        <input type="file" id="photo" name="photo" class="form-input" accept="image/jpeg, image/png">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <img id="imagePreview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Crect fill='%23ddd' width='200' height='200'/%3E%3Ctext fill='%23555' font-family='sans-serif' font-size='30' dy='10.5' font-weight='bold' x='50%25' y='50%25' text-anchor='middle'%3ENo Image%3C/text%3E%3C/svg%3E" alt="Image Preview" style="max-width: 100%; height: auto; margin-top: 10px;">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" id="cancelContestant" class="submit-button secondary-button">Cancel</button>
+                <button type="submit" class="submit-button">Save Contestant</button>
+            </div>
+        </form>
+    </div>
+</div>

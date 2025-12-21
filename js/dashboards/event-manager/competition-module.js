@@ -84,7 +84,6 @@ window.CompetitionModule = {
     const badge = document.getElementById('roundStatusBadge');
     const lockMsg = document.getElementById('roundLockMessage');
     const addBtn = document.getElementById('addSegmentBtn');
-    const lockBtn = document.getElementById('lockRoundBtn');
     const eventId = (this.state.activeEvent && this.state.activeEvent.id) ? this.state.activeEvent.id : 'default';
     const rounds = this.loadRounds(eventId);
     const id = sel && sel.value ? sel.value : '';
@@ -95,25 +94,15 @@ window.CompetitionModule = {
       if (badge) { badge.className = 'status-badge pending'; badge.textContent = '-'; }
       if (lockMsg) lockMsg.style.display = 'none';
       if (addBtn) addBtn.disabled = true;
-      if (lockBtn) lockBtn.disabled = true;
       this.renderSegmentsTable([]);
       return;
     }
     const status = r.status || 'Draft';
     const cls = status === 'Locked' ? 'approved' : (status === 'Draft' ? 'pending' : 'approved');
     if (badge) { badge.className = 'status-badge ' + cls; badge.textContent = status; }
-    const inactive = r.active === false;
-    const locked = status !== 'Draft' || inactive;
-    if (lockMsg) {
-      if (locked) {
-        lockMsg.textContent = inactive ? 'This round is deactivated. Editing is disabled.' : 'This round is locked. Editing is disabled.';
-        lockMsg.style.display = '';
-      } else {
-        lockMsg.style.display = 'none';
-      }
-    }
+    const locked = status !== 'Draft';
+    if (lockMsg) lockMsg.style.display = locked ? '' : 'none';
     if (addBtn) addBtn.disabled = locked;
-    if (lockBtn && inactive) lockBtn.disabled = true;
     const segs = this.loadSegments(eventId, r.id);
     this.renderSegmentsTable(segs);
     this.updatePercentStatus(segs);
@@ -203,11 +192,6 @@ window.CompetitionModule = {
     const evId = (this.state.activeEvent && this.state.activeEvent.id) ? this.state.activeEvent.id : 'default';
     const r = this.state.selectedRound;
     if (!r) return;
-    if (r.active === false) {
-      const status = document.getElementById('roundLockMessage');
-      if (status) { status.textContent = 'This round is deactivated. Editing is disabled.'; status.style.display = ''; }
-      return;
-    }
     const list = this.loadSegments(evId, r.id);
     const mode = (document.getElementById('segmentForm')?.getAttribute('data-mode')) || 'add';
     const existingId = this.state.editingSegmentId;
@@ -355,8 +339,7 @@ window.CompetitionModule = {
       status.textContent = `Segments total: ${sum}%` + (criteriaOk ? ' • Criteria totals valid' : ' • Criteria totals invalid');
     }
     const isDraft = r && (r.status || 'Draft') === 'Draft';
-    const isActive = r && r.active !== false;
-    if (lockBtn) lockBtn.disabled = !(ready && isDraft && isActive);
+    if (lockBtn) lockBtn.disabled = !(ready && isDraft);
   },
 
   lockSelectedRound() {

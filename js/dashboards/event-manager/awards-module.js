@@ -35,15 +35,13 @@ window.AwardsModule = {
     const form = document.getElementById('awardForm');
     const typeSel = document.getElementById('awardType');
     const scopeSel = document.getElementById('awardScope');
-    const nameEl = document.getElementById('awardName');
     const winnersClose = document.getElementById('closeWinners');
     if (addBtn) addBtn.addEventListener('click', () => this.openAwardModal('add'));
     if (overlay) overlay.addEventListener('click', () => this.closeAwardModal());
     if (cancelBtn) cancelBtn.addEventListener('click', () => this.closeAwardModal());
     if (form) form.addEventListener('submit', (e) => this.handleAwardSubmit(e));
     if (typeSel) typeSel.addEventListener('change', () => this.updateTypeSections());
-    if (scopeSel) scopeSel.addEventListener('change', () => { this.updateScopeSelectors(); this.validateAwardForm(); });
-    if (nameEl) nameEl.addEventListener('input', () => this.validateAwardForm());
+    if (scopeSel) scopeSel.addEventListener('change', () => this.updateScopeSelectors());
     if (winnersClose) winnersClose.addEventListener('click', () => this.closeWinners());
     const tbody = document.getElementById('awardsTbody');
     if (tbody) tbody.addEventListener('click', (e) => this.handleAwardsTableClick(e));
@@ -84,7 +82,6 @@ window.AwardsModule = {
     if (manualJust) manualJust.value = award ? (award.rules?.justification||'') : '';
     this.updateTypeSections();
     this.updateScopeSelectors();
-    this.validateAwardForm();
     modal.classList.remove('hidden');
     modal.setAttribute('aria-hidden','false');
     if (nameEl) nameEl.focus();
@@ -103,7 +100,6 @@ window.AwardsModule = {
 
   updateTypeSections() {
     const typeSel = document.getElementById('awardType');
-    const scopeSel = document.getElementById('awardScope');
     const auto = document.getElementById('automaticSettings');
     const aud = document.getElementById('audienceSettings');
     const man = document.getElementById('manualSettings');
@@ -111,11 +107,6 @@ window.AwardsModule = {
     if (auto) auto.style.display = v === 'Automatic' ? '' : 'none';
     if (aud) aud.style.display = v === 'Audience' ? '' : 'none';
     if (man) man.style.display = v === 'Manual' ? '' : 'none';
-    if (v === 'Automatic' && scopeSel && scopeSel.value !== 'Segment') {
-      scopeSel.value = 'Segment';
-      this.updateScopeSelectors();
-    }
-    this.validateAwardForm();
   },
 
   updateScopeSelectors() {
@@ -128,7 +119,6 @@ window.AwardsModule = {
     if (wr) wr.style.display = v === 'Round' || v === 'Segment' ? '' : 'none';
     if (ws) ws.style.display = v === 'Segment' ? '' : 'none';
     this.populateScopeSelectors();
-    this.updateAudienceVotingNote();
   },
 
   populateScopeSelectors() {
@@ -150,8 +140,7 @@ window.AwardsModule = {
       segSel.innerHTML = ['<option value="">Select segment</option>'].concat(segs.map(s => `<option value="${s.id}">${s.name}</option>`)).join('');
     }
     const roundSelWrap = document.getElementById('roundSelectorWrapper');
-    if (roundSel && roundSelWrap) roundSel.addEventListener('change', () => { this.populateScopeSelectors(); this.validateAwardForm(); this.updateAudienceVotingNote(); });
-    if (segSel) segSel.addEventListener('change', () => this.validateAwardForm());
+    if (roundSel && roundSelWrap) roundSel.addEventListener('change', () => this.populateScopeSelectors());
     const contestantsSel = document.getElementById('manualWinners');
     if (contestantsSel) {
       const raw = localStorage.getItem('bpms_contestants_' + eventId);
@@ -250,8 +239,6 @@ window.AwardsModule = {
     const segSel = document.getElementById('awardSegment');
     const err = document.getElementById('awardError');
     if (!nameEl || !typeSel || !scopeSel) return;
-    const vType = typeSel ? typeSel.value : '';
-    const vScope = scopeSel ? scopeSel.value : '';
     const fields = [
       { el: nameEl, valid: !!nameEl.value.trim() },
       { el: typeSel, valid: !!typeSel.value },
@@ -260,8 +247,19 @@ window.AwardsModule = {
     let firstInvalid = null;
     fields.forEach(f => { if (!f.el) return; const invalid = !f.valid; this.setInvalid(f.el, invalid); if (invalid && !firstInvalid) firstInvalid = f.el; });
     if (firstInvalid) { if (err) { err.textContent = 'Please complete required fields.'; err.style.display = ''; } firstInvalid.focus(); return; }
-    const errText = this.validateAwardForm();
-    if (errText) { if (err) { err.textContent = errText; err.style.display = ''; } return; }
+    const vType = typeSel.value;
+    const vScope = scopeSel.value;
+    if (vType === 'Automatic') {
+      if (vScope !== 'Segment' || !segSel || !segSel.value) { if (err) { err.textContent = 'Automatic awards must be linked to a segment.'; err.style.display = ''; } return; }
+    }
+    if (vType === 'Audience') {
+      const rid = roundSel ? roundSel.value : '';
+      const roundsRaw = localStorage.getItem('bpms_rounds_' + eventId);
+      let rounds = []; try { rounds = roundsRaw ? JSON.parse(roundsRaw) : []; } catch(e) { rounds = []; }
+      const r = rounds.find(x => x.id === rid);
+      const enabled = !!(r && r.audience_voting);
+      if (!enabled) { if (err) { err.textContent = 'Audience voting is not enabled for selected scope.'; err.style.display = ''; } return; }
+    }
     const form = document.getElementById('awardForm');
     const mode = form ? form.getAttribute('data-mode') : 'add';
     const id = mode === 'edit' && form ? form.getAttribute('data-id') : ('award_' + Date.now());
@@ -295,51 +293,6 @@ window.AwardsModule = {
 
   setInvalid(el, invalid) { if (!el) return; el.classList.toggle('invalid', !!invalid); },
 
-  validateAwardForm() {
-    const eventId = (this.state.activeEvent && this.state.activeEvent.id) ? this.state.activeEvent.id : 'default';
-    const nameEl = document.getElementById('awardName');
-    const typeSel = document.getElementById('awardType');
-    const scopeSel = document.getElementById('awardScope');
-    const roundSel = document.getElementById('awardRound');
-    const segSel = document.getElementById('awardSegment');
-    const err = document.getElementById('awardError');
-    const form = document.getElementById('awardForm');
-    const saveBtn = form ? form.querySelector('button[type="submit"]') : null;
-    const vType = typeSel ? typeSel.value : '';
-    const vScope = scopeSel ? scopeSel.value : '';
-    let errors = [];
-    let warnings = [];
-    if (!nameEl || !typeSel || !scopeSel || !nameEl.value.trim() || !vType || !vScope) {
-      errors.push('Please complete required fields.');
-    }
-    if (!errors.length) {
-      if (vScope === 'Round') {
-        if (!roundSel || !roundSel.value) errors.push('Select a round.');
-      }
-      if (vScope === 'Segment') {
-        if (!roundSel || !roundSel.value) errors.push('Select a round.');
-        if (!segSel || !segSel.value) warnings.push('No segment selected yet. You can still save as Draft.');
-      }
-      if (vType === 'Audience') {
-        const rid = roundSel ? roundSel.value : '';
-        const roundsRaw = localStorage.getItem('bpms_rounds_' + eventId);
-        let rounds = []; try { rounds = roundsRaw ? JSON.parse(roundsRaw) : []; } catch(e) { rounds = []; }
-        const r = rounds.find(x => x.id === rid);
-        const enabled = !!(r && r.audience_voting);
-        if (!enabled && vScope !== 'Event') warnings.push('Audience voting not enabled for selected round.');
-      }
-      if (vType === 'Automatic' && vScope !== 'Segment') warnings.push('Automatic awards work best when scoped to a specific segment.');
-    }
-    const errText = errors.join(' ');
-    if (err) {
-      if (errText) { err.textContent = errText; err.style.display = ''; }
-      else if (warnings.length) { err.textContent = warnings.join(' '); err.style.display = ''; }
-      else { err.style.display = 'none'; err.textContent = ''; }
-    }
-    if (saveBtn) saveBtn.disabled = !!errText;
-    return errText;
-  },
-
   toggleAwardReady(id) {
     const eventId = (this.state.activeEvent && this.state.activeEvent.id) ? this.state.activeEvent.id : 'default';
     const list = this.loadAwards(eventId);
@@ -362,100 +315,6 @@ window.AwardsModule = {
     this.loadAndRenderAwards();
   },
 
-  getScoresKey(eventId, roundId, segmentId) {
-    return 'bpms_scores_' + eventId + '_' + roundId + '_' + segmentId;
-  },
-  loadScores(eventId, roundId, segmentId) {
-    const raw = localStorage.getItem(this.getScoresKey(eventId, roundId, segmentId));
-    try { return raw ? JSON.parse(raw) : null; } catch(e) { return null; }
-  },
-  aggregateJudgeTotals(data) {
-    const totals = {};
-    if (!data) return totals;
-    if (Array.isArray(data)) {
-      data.forEach(entry => {
-        const cid = entry && (entry.contestant_id || entry.contestantId || entry.cid);
-        if (!cid) return;
-        let t = 0;
-        if (typeof entry.total === 'number') t = entry.total;
-        else if (Array.isArray(entry.criteria_scores)) t = entry.criteria_scores.reduce((s,v)=>s+(typeof v==='number'?v:0),0);
-        else if (Array.isArray(entry.criteriaScores)) t = entry.criteriaScores.reduce((s,v)=>s+(typeof v==='number'?v:0),0);
-        else if (entry.criteria_scores && typeof entry.criteria_scores === 'object') t = Object.values(entry.criteria_scores).reduce((s,v)=>s+(typeof v==='number'?v:0),0);
-        totals[cid] = (totals[cid]||0) + t;
-      });
-    } else if (typeof data === 'object') {
-      Object.keys(data).forEach(cid => {
-        const val = data[cid];
-        if (typeof val === 'number') totals[cid] = (totals[cid]||0) + val;
-      });
-    }
-    return totals;
-  },
-
-  getVotesKey(eventId, roundId, segmentId) {
-    return segmentId ? ('bpms_votes_' + eventId + '_' + roundId + '_' + segmentId) : ('bpms_votes_' + eventId + '_' + roundId);
-  },
-  loadVotes(eventId, roundId, segmentId) {
-    const primary = localStorage.getItem(this.getVotesKey(eventId, roundId, segmentId));
-    const fallback = !segmentId ? null : localStorage.getItem(this.getVotesKey(eventId, roundId, null));
-    let data = null;
-    try { data = primary ? JSON.parse(primary) : null; } catch(e) { data = null; }
-    if (!data && fallback) { try { data = JSON.parse(fallback); } catch(e) { data = null; } }
-    return data;
-  },
-  aggregateVoteCounts(data) {
-    const counts = {};
-    if (!data) return counts;
-    if (Array.isArray(data)) {
-      data.forEach(entry => {
-        const cid = entry && (entry.contestant_id || entry.contestantId || entry.cid);
-        if (!cid) return;
-        const c = typeof entry.count === 'number' ? entry.count : 1;
-        counts[cid] = (counts[cid]||0) + c;
-      });
-    } else if (typeof data === 'object') {
-      Object.keys(data).forEach(cid => {
-        const val = data[cid];
-        if (typeof val === 'number') counts[cid] = (counts[cid]||0) + val;
-      });
-    }
-    return counts;
-  },
-
-  selectWinnersFromMap(map, allowMultiple, basis) {
-    const entries = Object.entries(map).map(([cid,val]) => ({ cid, val }));
-    if (!entries.length) return [];
-    entries.sort((a,b)=>b.val - a.val);
-    const topVal = entries[0].val;
-    const top = allowMultiple ? entries.filter(e => e.val === topVal) : [entries[0]];
-    return top.map(e => ({ contestant_id: e.cid, value: e.val, basis }));
-  },
-
-  loadContestantsMap(eventId) {
-    const raw = localStorage.getItem('bpms_contestants_' + eventId);
-    let list = [];
-    try { list = raw ? JSON.parse(raw) : []; } catch(e) { list = []; }
-    const map = {};
-    list.forEach(c => { map[c.id] = c.name || c.full_name || ('Contestant ' + c.id); });
-    return map;
-  },
-
-  updateAudienceVotingNote() {
-    const note = document.getElementById('audienceVotingNote');
-    const scopeSel = document.getElementById('awardScope');
-    const roundSel = document.getElementById('awardRound');
-    const vScope = scopeSel ? scopeSel.value : '';
-    if (!note) return;
-    if (vScope !== 'Round' && vScope !== 'Segment') { note.textContent = ''; return; }
-    const eventId = (this.state.activeEvent && this.state.activeEvent.id) ? this.state.activeEvent.id : 'default';
-    const roundsRaw = localStorage.getItem('bpms_rounds_' + eventId);
-    let rounds = []; try { rounds = roundsRaw ? JSON.parse(roundsRaw) : []; } catch(e) { rounds = []; }
-    const rid = roundSel ? roundSel.value : '';
-    const r = rounds.find(x => x.id === rid);
-    const enabled = !!(r && r.audience_voting);
-    note.textContent = enabled ? 'Audience voting is enabled for this round.' : 'Audience voting is not enabled for this round.';
-  },
-
   computeAward(id) {
     const eventId = (this.state.activeEvent && this.state.activeEvent.id) ? this.state.activeEvent.id : 'default';
     const list = this.loadAwards(eventId);
@@ -468,21 +327,9 @@ window.AwardsModule = {
       const w = a.rules?.winners || [];
       winners = w.map(cid => ({ contestant_id: cid, value: null, basis: 'manual' }));
     } else if (a.type === 'Automatic') {
-      const rid = a.scope.round_id;
-      const sid = a.scope.segment_id;
-      const data = this.loadScores(eventId, rid, sid);
-      if (!data) { alert('No judge scores found for selected segment.'); return; }
-      const totals = this.aggregateJudgeTotals(data);
-      winners = this.selectWinnersFromMap(totals, !!(a.rules && a.rules.tie_allow_multiple), 'judge');
-      if (!winners.length) { alert('No judge scores found for selected segment.'); return; }
+      winners = [];
     } else if (a.type === 'Audience') {
-      const rid = a.scope.round_id;
-      const sid = a.scope.segment_id;
-      const data = this.loadVotes(eventId, rid, sid);
-      if (!data) { alert('No audience votes found for selected scope.'); return; }
-      const counts = this.aggregateVoteCounts(data);
-      winners = this.selectWinnersFromMap(counts, !!(a.rules && a.rules.tie_allow_multiple), 'audience');
-      if (!winners.length) { alert('No audience votes found for selected scope.'); return; }
+      winners = [];
     }
     const results = this.loadAwardResults(eventId);
     results[id] = { award_id: id, winners, computed_at: new Date().toISOString(), source: a.type };
@@ -518,12 +365,7 @@ window.AwardsModule = {
     if (!modal || !body) return;
     if (!r || !(r.winners||[]).length) { body.innerHTML = '<div class="empty-state"><div class="empty-state-text">No winners recorded</div></div>'; }
     else {
-      const cmap = this.loadContestantsMap(eventId);
-      const rows = r.winners.map(w => {
-        const name = cmap[w.contestant_id] || ('Contestant ' + w.contestant_id);
-        const val = w.value!==null ? (' ' + w.value) : '';
-        return `<div class="form-group"><div class="input-wrapper"><input class="form-input" disabled value="${name} • ${w.basis}${val}"></div></div>`;
-      }).join('');
+      const rows = r.winners.map(w => `<div class="form-group"><div class="input-wrapper"><input class="form-input" disabled value="Contestant ${w.contestant_id} • ${w.basis}${w.value!==null?(' '+w.value):''}"></div></div>`).join('');
       body.innerHTML = rows;
     }
     modal.classList.remove('hidden');

@@ -1,0 +1,77 @@
+<section id="registerJudgeView" class="dashboard-view">
+  <div class="page-header">
+    <div>
+      <h1 class="event-title">Register Judge</h1>
+      <p class="page-subtitle">Add and manage judges</p>
+    </div>
+    <button id="addJudgeBtn" class="submit-button">Add Judge</button>
+  </div>
+
+  <div class="filters-bar">
+    <input id="judgeSearch" class="form-input" type="text" placeholder="Search name or email">
+    <select id="filterJudgeStatus" class="form-input form-select">
+      <option value="">All Status</option>
+      <option value="active">Active</option>
+      <option value="inactive">Inactive</option>
+      <option value="pending">Pending</option>
+    </select>
+  </div>
+
+  <div class="recent-registrations-card">
+    <h2 class="section-title">Judges</h2>
+    <table class="data-table" id="judgesTable">
+      <thead>
+        <tr>
+          <th>Avatar</th>
+          <th>Name/Email</th>
+          <th>Status</th>
+          <th>Date Added</th>
+          <th>Last Login</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="judgesTbody">
+        <tr>
+          <td colspan="6" class="empty-state"><div class="empty-state-text">No judges yet</div></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<div id="judgeModal" class="modal hidden" role="dialog" aria-labelledby="judgeModalTitle" aria-hidden="true">
+  <div class="modal-overlay"></div>
+  <div class="modal-content" style="width:min(95vw, 720px)">
+    <h3 id="judgeModalTitle" class="modal-title">Add Judge</h3>
+    <form id="judgeForm" class="modal-form" novalidate>
+      <div class="modal-body">
+        <div id="judgeError" class="error-message" style="display:none"></div>
+
+        <div class="form-group">
+          <label for="judgeFullName" class="form-label">Full Name</label>
+          <div class="input-wrapper">
+            <input id="judgeFullName" type="text" class="form-input" placeholder="e.g., Jane D. Smith" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="judgeEmail" class="form-label">Email Address</label>
+          <div class="input-wrapper">
+            <input id="judgeEmail" type="email" class="form-input" placeholder="name@example.com" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="judgeTempPassword" class="form-label">Temporary Password</label>
+          <div class="input-wrapper">
+            <input id="judgeTempPassword" type="password" class="form-input" placeholder="Minimum 8 characters" required>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" id="cancelJudge" class="submit-button secondary-button">Cancel</button>
+        <button type="submit" class="submit-button">Save Judge</button>
+      </div>
+    </form>
+  </div>
+</div>
