@@ -13,8 +13,17 @@
     overlay.setAttribute('aria-hidden', 'true');
   }
 
+  function handleContestantLogout() {
+    try {
+      localStorage.removeItem('bpms_session');
+      localStorage.removeItem('bpms_active_event');
+    } catch (e) {}
+    window.location.href = '../../index.html';
+  }
+
   window.openInboxModal = openInboxModal;
   window.closeInboxModal = closeInboxModal;
+  window.handleContestantLogout = handleContestantLogout;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', bindModalGuards);

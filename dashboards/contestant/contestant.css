@@ -21,6 +21,7 @@ body {
     border-bottom-left-radius: 20px;
     border-bottom-right-radius: 20px;
     text-align: center;
+    position: relative;
 }
 
 .profile-img {
@@ -149,6 +150,23 @@ body {
 
 .nav-item.active { color: var(--primary); }
 .nav-icon { display: block; font-size: 1.2rem; margin-bottom: 2px; }
+
+.logout-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(255,255,255,0.1);
+    color: var(--white);
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    backdrop-filter: blur(2px);
+}
+.logout-btn:hover {
+    background: rgba(255,255,255,0.2);
+}
 
 .inbox-btn {
     background: var(--primary);
